@@ -1,0 +1,12 @@
+enum Role {
+    SUPER_ADMIN
+    ADMIN
+    MERCHANT
+    RIDER
+    CUSTOMER
+}
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+  DELETED
+}

@@ -3,6 +3,9 @@ model Customers {
     name          String
     email         String    @unique
     contactNumber String?
+    thana        String?
+    district     String?
+    division     String?
     address       String?
     isDeleted     Boolean   @default(false)
     deletedAt     DateTime?

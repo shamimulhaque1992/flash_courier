@@ -1,12 +1,50 @@
 enum Role {
-    SUPER_ADMIN
-    ADMIN
-    MERCHANT
-    RIDER
-    CUSTOMER
+  SUPER_ADMIN
+  ADMIN
+  MERCHANT
+  RIDER
+  CUSTOMER
 }
+
 enum UserStatus {
   ACTIVE
   BLOCKED
   DELETED
+}
+
+enum AuthProvider {
+  CREDENTIALS
+  GOOGLE
+}
+
+enum MerchantVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum RiderVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum ShipmentStatus {
+  PENDING
+  READY_FOR_ASSIGNMENT
+  ASSIGNED
+  PICKED_UP
+  IN_TRANSIT
+  DELIVERED
+  RETURNED_BY_CUSTOMER
+  ACCEPTED_BY_RIDER
+  REJECTED_BY_RIDER
+  CANCELLED_BY_MERCHANT
 }

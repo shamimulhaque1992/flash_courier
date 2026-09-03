@@ -5,7 +5,9 @@ import { redisClient } from "./app/lib/redis";
 import {
   seedSupperAdmin,
   seedTesterAdmin,
-  seedTesterDoctor,
+  seedTesterCustomer,
+  seedTesterMerchant,
+  seedTesterRider,
 } from "./app/utils/seed";
 
 const PORT = config.port;
@@ -20,9 +22,11 @@ const main = async () => {
 
     console.log("SMTP transporter is ready to send emails.");
 
-    await seedSupperAdmin();
-    await seedTesterAdmin();
-    await seedTesterDoctor();
+    // await seedSupperAdmin();
+    // await seedTesterAdmin();
+    // await seedTesterMerchant();
+    // await seedTesterRider();
+    // await seedTesterCustomer();
 
     // cron jobs
     // await deleteUnverifiedDoctors();

@@ -1,0 +1,22 @@
+model Riders {
+    id                        String                  @id @default(uuid())
+    name                      String
+    email                     String                  @unique
+    contactNumber             String                  @unique
+    nidNumber                 String                  @unique
+    nidDocument               String
+    nidDocumentPublicId       String
+    additionalDocuments       Json?
+    address                   String?
+    licenseNumber             String?
+    vehicleType               String?
+    vehicleRegistrationNumber String?
+    verificationStatus        RiderVerificationStatus @default(PENDING)
+    rejectionReason           String?
+    reviewedBy                String?
+    reviewedAt                DateTime?
+    isDeleted                 Boolean                 @default(false)
+    deletedAt                 DateTime?
+    createdAt                 DateTime                @default(now())
+    updatedAt                 DateTime                @updatedAt
+}

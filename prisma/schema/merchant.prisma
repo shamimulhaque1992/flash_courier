@@ -1,0 +1,21 @@
+model Merchant {
+    id                              String                     @id @default(uuid())
+    name                            String
+    email                           String                     @unique
+    contactNumber                   String?
+    address                         String?
+    businessLicenseNumber           String                     @unique
+    businessType                    String
+    businessDescription             String?
+    businessLicenseDocument         String
+    businessLicenseDocumentPublicId String
+    additionalDocuments             Json?
+    verificationStatus              MerchantVerificationStatus @default(PENDING)
+    rejectionReason                 String?
+    reviewedBy                      String?
+    reviewedAt                      DateTime?
+    isDeleted                       Boolean                    @default(false)
+    deletedAt                       DateTime?
+    createdAt                       DateTime                   @default(now())
+    updatedAt                       DateTime                   @updatedAt
+}

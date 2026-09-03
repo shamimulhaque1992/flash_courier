@@ -1,0 +1,12 @@
+model ShipmentHistories {
+    id            String         @id @default(uuid())
+    shipmentId    String         @unique
+    shipment      Shipments      @relation(fields: [shipmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    status        ShipmentStatus
+    updatedBy     String
+    updatedByUser Users          @relation(fields: [updatedBy], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    updatedAt     DateTime       @default(now())
+    remarks       String?
+
+    @@map("shipment_history")
+}

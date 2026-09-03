@@ -29,6 +29,13 @@ enum RiderVerificationStatus {
   REJECTED
 }
 
+enum RiderScheduleStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  COMPLETED
+}
+
 enum PaymentStatus {
   PENDING
   PAID

@@ -1,6 +1,6 @@
 model ShipmentHistories {
     id            String         @id @default(uuid())
-    shipmentId    String         @unique
+    shipmentId    String
     shipment      Shipments      @relation(fields: [shipmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     status        ShipmentStatus
     updatedBy     String

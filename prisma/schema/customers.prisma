@@ -11,5 +11,8 @@ model Customers {
     userId        String    @unique
     user          Users      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
+    shipments Shipments[]
+    reviews   Reviews[]
+
     @@map("customers")
 }

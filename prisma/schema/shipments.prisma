@@ -1,13 +1,6 @@
 model Shipments {
     id                    String         @id @default(uuid())
     trackingNumber        String         @unique
-    merchantName          String
-    merchantEmail         String
-    merchantContactNumber String
-    merchantThana         String
-    merchantDistrict      String
-    merchantDivision      String
-    merchantAddress       String
     receiverName          String
     receiverEmail         String
     receiverContactNumber String
@@ -20,15 +13,27 @@ model Shipments {
     packageDimensions     String?
     deliveryFee           Decimal        @db.Decimal(10, 2)
     paymentStatus         PaymentStatus  @default(PENDING)
-    shipmentStatus        ShipmentStatus @default(PENDING)
+    shipmentStatus        ShipmentStatus @default(PENDING_PAYMENT)
     note                  String?
     isDeleted             Boolean        @default(false)
     deletedAt             DateTime?
     createdAt             DateTime       @default(now())
     updatedAt             DateTime       @updatedAt
 
+    pickedUpAt            DateTime?
+    probableDeliveryTime  DateTime?
+    actualDeliveryTime    DateTime?
+
+    merchantId      String
+    merchant        Merchants  @relation(fields: [merchantId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+    customerId      String?
+    customer        Customers? @relation(fields: [customerId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    riderId         String?
+    rider           Riders?    @relation(fields: [riderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
     payment         Payments?
-    shipmentHistory ShipmentHistories?
+    shipmentHistory ShipmentHistories[]
+    reviews         Reviews?
 
     @@map("shipments")
 }

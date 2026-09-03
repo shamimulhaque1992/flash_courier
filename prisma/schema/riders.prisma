@@ -7,6 +7,9 @@ model Riders {
     nidDocument               String
     nidDocumentPublicId       String
     additionalDocuments       Json?
+    ridersThana               String
+    ridersDistrict            String
+    ridersDivision            String
     address                   String?
     licenseNumber             String?
     vehicleType               String?
@@ -21,6 +24,8 @@ model Riders {
     updatedAt                 DateTime                @updatedAt
 
     riderSchedules RiderSchedules[]
+    shipments      Shipments[]
+    reviews        Reviews[]
 
     userId String @unique
     user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)

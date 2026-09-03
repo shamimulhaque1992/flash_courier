@@ -3,6 +3,9 @@ model Merchants {
     name                            String
     email                           String                     @unique
     contactNumber                   String?
+    thana                           String
+    district                        String
+    division                        String
     address                         String?
     businessLicenseNumber           String                     @unique
     businessType                    String
@@ -20,6 +23,9 @@ model Merchants {
     updatedAt                       DateTime                   @updatedAt
     userId                          String                     @unique
     user                            Users                      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+    shipments Shipments[]
+    reviews   Reviews[]
 
     @@map("merchants")
 }

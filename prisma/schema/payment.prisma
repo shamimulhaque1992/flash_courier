@@ -8,12 +8,12 @@ model Payments {
     bkashPaymentId        String?       @unique
     bkashTrxId            String?
     payerReference        String?
-    paidAt                String?
+    paidAt                DateTime?
     gatewayResponse       Json?
     refundTrxId           String?
     refundAmount          Decimal?      @db.Decimal(10, 2)
     refundReason          String?
-    refundedAt            String?
+    refundedAt            DateTime?
     shipmentId            String        @unique
     shipment              Shipments     @relation(fields: [shipmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     createdAt             DateTime      @default(now())

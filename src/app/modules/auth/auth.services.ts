@@ -26,7 +26,7 @@ import { JwtPayload, SignOptions } from "jsonwebtoken";
 import { googleClient } from "../../lib/googleAuth";
 
 const registerCustomer = async (payload: IRegisterCustomerPayload) => {
-  const { name, email, password, customers } = payload;
+  const { name, email, password, customer } = payload;
 
   const isUserExists = await prisma.users.findUnique({
     where: {
@@ -55,7 +55,7 @@ const registerCustomer = async (payload: IRegisterCustomerPayload) => {
     name,
     email,
     password: hashedPassword,
-    customers,
+    customer,
   };
 
   await redisClient.set(
@@ -141,7 +141,11 @@ const verifyUserEmail = async (payload: IVerifyEmailPayload) => {
           name: customerRegistrationData.name,
           email: customerRegistrationData.email,
           contactNumber:
-            customerRegistrationData.customers?.contactNumber || null,
+            customerRegistrationData.customer?.contactNumber || null,
+          thana: customerRegistrationData.customer?.thana || null,
+          district: customerRegistrationData.customer?.district || null,
+          division: customerRegistrationData.customer?.division || null,
+          address: customerRegistrationData.customer?.address || null,
         },
       },
     },

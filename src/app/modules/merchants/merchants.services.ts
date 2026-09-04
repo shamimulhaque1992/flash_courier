@@ -364,4 +364,9 @@ const getAllMerchants = async (query: IQuery) => {
   };
 };
 
-export const MerchantServices = {};
+export const MerchantServices = {
+  applyAsMerchant,
+  verifyMerchantEmail,
+  approveMerchantApplication,
+  getAllMerchants,
+};

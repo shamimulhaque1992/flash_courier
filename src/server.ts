@@ -22,11 +22,11 @@ const main = async () => {
 
     console.log("SMTP transporter is ready to send emails.");
 
-    // await seedSupperAdmin();
-    // await seedTesterAdmin();
-    // await seedTesterMerchant();
-    // await seedTesterRider();
-    // await seedTesterCustomer();
+    await seedSupperAdmin();
+    await seedTesterAdmin();
+    await seedTesterMerchant();
+    await seedTesterRider();
+    await seedTesterCustomer();
 
     // cron jobs
     // await deleteUnverifiedDoctors();

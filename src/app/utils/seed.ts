@@ -7,7 +7,7 @@ import { AppError } from "./AppError";
 
 export const seedSupperAdmin = async () => {
   try {
-    const isSupperAdminExists = await prisma.user.findFirst({
+    const isSupperAdminExists = await prisma.users.findFirst({
       where: {
         role: Role.SUPER_ADMIN,
       },
@@ -32,7 +32,7 @@ export const seedSupperAdmin = async () => {
       Number(config.bcrypt_salt_rounds),
     );
 
-    const supperAdmin = await prisma.user.create({
+    const supperAdmin = await prisma.users.create({
       data: {
         name,
         email,
@@ -45,7 +45,7 @@ export const seedSupperAdmin = async () => {
 
     console.log("Supper admin crated", supperAdmin);
   } catch (error) {
-    await prisma.user.delete({
+    await prisma.users.delete({
       where: {
         email: config.super_admin_email,
       },
@@ -55,7 +55,7 @@ export const seedSupperAdmin = async () => {
 
 export const seedTesterAdmin = async () => {
   try {
-    const isTesterAdminExists = await prisma.user.findUnique({
+    const isTesterAdminExists = await prisma.users.findUnique({
       where: {
         email: config.tester_admin_email,
       },
@@ -80,7 +80,7 @@ export const seedTesterAdmin = async () => {
       Number(config.bcrypt_salt_rounds),
     );
 
-    const testerAdmin = await prisma.user.create({
+    const testerAdmin = await prisma.users.create({
       data: {
         name,
         email,
@@ -94,7 +94,7 @@ export const seedTesterAdmin = async () => {
     console.log("Tester admin created", testerAdmin);
   } catch (error) {
     console.log("🚀 ~ seedTesterAdmin ~ error:", error);
-    await prisma.user.delete({
+    await prisma.users.delete({
       where: {
         email: config.tester_admin_email,
       },
@@ -104,7 +104,7 @@ export const seedTesterAdmin = async () => {
 
 export const seedTesterMerchant = async () => {
   try {
-    const isTesterMerchantExists = await prisma.user.findFirst({
+    const isTesterMerchantExists = await prisma.users.findFirst({
       where: {
         role: Role.MERCHANT,
       },
@@ -131,7 +131,7 @@ export const seedTesterMerchant = async () => {
       Number(config.bcrypt_salt_rounds),
     );
 
-    const testerMerchant = await prisma.user.create({
+    const testerMerchant = await prisma.users.create({
       data: {
         name,
         email,
@@ -144,7 +144,7 @@ export const seedTesterMerchant = async () => {
 
     console.log("Tester merchant created", testerMerchant);
   } catch (error) {
-    await prisma.user.delete({
+    await prisma.users.delete({
       where: {
         email: config.tester_merchant_email,
       },
@@ -154,7 +154,7 @@ export const seedTesterMerchant = async () => {
 
 export const seedTesterRider = async () => {
   try {
-    const isTesterRiderExists = await prisma.user.findFirst({
+    const isTesterRiderExists = await prisma.users.findFirst({
       where: {
         role: Role.RIDER,
       },
@@ -181,7 +181,7 @@ export const seedTesterRider = async () => {
       Number(config.bcrypt_salt_rounds),
     );
 
-    const testerRider = await prisma.user.create({
+    const testerRider = await prisma.users.create({
       data: {
         name,
         email,
@@ -194,7 +194,7 @@ export const seedTesterRider = async () => {
 
     console.log("Tester rider created", testerRider);
   } catch (error) {
-    await prisma.user.delete({
+    await prisma.users.delete({
       where: {
         email: config.tester_rider_email,
       },
@@ -204,7 +204,7 @@ export const seedTesterRider = async () => {
 
 export const seedTesterCustomer = async () => {
   try {
-    const isTesterCustomerExists = await prisma.user.findFirst({
+    const isTesterCustomerExists = await prisma.users.findFirst({
       where: {
         role: Role.CUSTOMER,
       },
@@ -231,7 +231,7 @@ export const seedTesterCustomer = async () => {
       Number(config.bcrypt_salt_rounds),
     );
 
-    const testerCustomer = await prisma.user.create({
+    const testerCustomer = await prisma.users.create({
       data: {
         name,
         email,
@@ -244,7 +244,7 @@ export const seedTesterCustomer = async () => {
 
     console.log("Tester customer created", testerCustomer);
   } catch (error) {
-    await prisma.user.delete({
+    await prisma.users.delete({
       where: {
         email: config.tester_customer_email,
       },

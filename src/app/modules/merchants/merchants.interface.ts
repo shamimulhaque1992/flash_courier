@@ -1,13 +1,30 @@
-export interface IMerchant {
-    id: string;
+import { MerchantVerificationStatus, Role } from "../../../generated/prisma/enums";
+
+export interface IApplyAsMerchantPayload {
+  user: {
     name: string;
     email: string;
-    contactNumber?: string;
-    address?: string;
+    password: string;
+    role: Role;
+  };
+  merchant: {
+    contactNumber: string;
+    thana: string;
+    district: string;
+    division: string;
+    address: string;
+	tradeLicenseNumber: string;
     businessLicenseNumber: string;
     businessType: string;
-    businessDescription?: string;
-    businessLicenseDocument: string;
-    businessLicenseDocumentPublicId: string;
-    userId: string;
+    businessDescription: string;
+  };
+}
+export interface IVerifyMerchantEmailPayload {
+  email: string;
+  otp: string;
+}
+export interface IApproveMerchantApplicationPayload {
+  merchantId: string;
+  verificationStatus: MerchantVerificationStatus;
+  rejectionReason?: string;
 }

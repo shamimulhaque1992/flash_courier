@@ -1,11 +1,11 @@
-import { RiderScheduleStatus } from "../../../generated/prisma";
+import type { RiderScheduleStatus } from "../../../generated/prisma";
 
 export interface IRiderSchedule {
-    id: string;
-    startDateTime: Date;
-    endDateTime: Date;
-    totalSlots: number;
-    availableSlots: number;
-    status: RiderScheduleStatus;
-    riderId: string;
+	id: string;
+	startDateTime: Date;
+	endDateTime: Date;
+	totalSlots: number;
+	availableSlots: number;
+	status: RiderScheduleStatus;
+	riderId: string;
 }

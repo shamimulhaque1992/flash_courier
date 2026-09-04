@@ -9,6 +9,7 @@ model Merchants {
     address                         String?
     businessLicenseNumber           String                     @unique
     businessType                    String
+    tradeLicenseNumber              String
     businessDescription             String?
     businessLicenseDocument         String
     businessLicenseDocumentPublicId String

@@ -11,6 +11,7 @@ import config from "./app/config";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
 import { AuthRoutes } from "./app/modules/auth/auth.route";
+
 // import { UserRoutes } from "./app/module/user/user.route";
 
 const app: Application = express();
@@ -31,8 +32,6 @@ app.use(cookieParser());
 
 app.use("/api/v1/auth", AuthRoutes);
 // app.use("/api/v1/user", UserRoutes);
-
-
 
 // Basic route
 app.get("/", async (_req: Request, res: Response) => {

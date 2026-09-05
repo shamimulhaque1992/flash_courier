@@ -1,4 +1,7 @@
-import { MerchantVerificationStatus, Role } from "../../../generated/prisma/enums";
+import {
+  MerchantVerificationStatus,
+  Role,
+} from "../../../generated/prisma/enums";
 
 export interface IApplyAsMerchantPayload {
   user: {
@@ -13,7 +16,7 @@ export interface IApplyAsMerchantPayload {
     district: string;
     division: string;
     address: string;
-	tradeLicenseNumber: string;
+    tradeLicenseNumber: string;
     businessLicenseNumber: string;
     businessType: string;
     businessDescription: string;

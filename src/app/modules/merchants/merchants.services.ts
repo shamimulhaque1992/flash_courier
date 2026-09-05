@@ -27,7 +27,7 @@ const applyAsMerchant = async (
   businessLicenseDocument: Express.Multer.File | null,
   additionalDocuments: Express.Multer.File[],
 ) => {
-  console.log("🚀 ~ applyAsMerchant ~ payload:", payload)
+  console.log("🚀 ~ applyAsMerchant ~ payload:", payload);
   const isUserExists = await prisma.users.findUnique({
     where: {
       email: payload.user.email,

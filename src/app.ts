@@ -12,6 +12,7 @@ import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
 import { AuthRoutes } from "./app/modules/auth/auth.route";
 import { MerchantRoutes } from "./app/modules/merchants/merchants.route";
+import { RiderRoutes } from "./app/modules/riders/riders.route";
 
 // import { UserRoutes } from "./app/module/user/user.route";
 
@@ -33,7 +34,7 @@ app.use(cookieParser());
 
 app.use("/api/v1/auth", AuthRoutes);
 app.use("/api/v1/merchants", MerchantRoutes);
-// app.use("/api/v1/user", UserRoutes);
+app.use("/api/v1/riders", RiderRoutes);
 
 // Basic route
 app.get("/", async (_req: Request, res: Response) => {

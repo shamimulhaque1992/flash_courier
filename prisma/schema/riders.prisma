@@ -7,9 +7,9 @@ model Riders {
     nidDocument               String
     nidDocumentPublicId       String
     additionalDocuments       Json?
-    ridersThana               String
-    ridersDistrict            String
-    ridersDivision            String
+    thana                     String
+    district                  String
+    division                  String
     address                   String?
     licenseNumber             String?
     vehicleType               String?

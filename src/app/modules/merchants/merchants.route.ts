@@ -9,12 +9,11 @@ import { MerchantValidations } from "./merchants.validation";
 const router = Router();
 
 router.post(
-  "/apply",
+  "/apply-as-merchant",
   upload.fields([
     { name: "businessLicenseDocument", maxCount: 1 },
     { name: "additionalDocuments", maxCount: 5 },
   ]),
-  validateRequest(MerchantValidations.MerchantRegistrationZodSchema),
   MerchantControllers.applyAsMerchant,
 );
 

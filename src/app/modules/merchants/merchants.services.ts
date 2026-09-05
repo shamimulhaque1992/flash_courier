@@ -27,6 +27,7 @@ const applyAsMerchant = async (
   businessLicenseDocument: Express.Multer.File | null,
   additionalDocuments: Express.Multer.File[],
 ) => {
+  console.log("🚀 ~ applyAsMerchant ~ payload:", payload)
   const isUserExists = await prisma.users.findUnique({
     where: {
       email: payload.user.email,
@@ -117,7 +118,7 @@ const applyAsMerchant = async (
   });
 
   const expirationSeconds = 60 * 60;
-  const otpKey = `doctor-application-otp-${payload.user.email}`;
+  const otpKey = `merchant-application-otp-${payload.user.email}`;
   const otpValue = crypto.randomInt(100000, 1000000).toString();
 
   await redisClient.set(otpKey, otpValue, {

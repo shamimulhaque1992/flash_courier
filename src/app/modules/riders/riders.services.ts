@@ -157,6 +157,16 @@ const verifyRiderEmail = async (payload: IVerifyRiderEmailPayload) => {
     include: { riders: true },
   });
 
+  const templateData = {
+    name: verifiedUser.name,
+    email: verifiedUser.email,
+  };
+  await sendEmail("email-verified-success.ejs", templateData, {
+    from: config.email_sender,
+    to: verifiedUser.email,
+    subject: "Your email has been verified",
+  });
+
   return verifiedUser;
 };
 

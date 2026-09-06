@@ -8,7 +8,7 @@ model Payments {
     bkashPaymentId        String?       @unique
     bkashTrxId            String?
     payerReference        String?
-    paidAt                DateTime?
+    paidAt                String?
     gatewayResponse       Json?
     refundTrxId           String?
     refundAmount          Decimal?      @db.Decimal(10, 2)

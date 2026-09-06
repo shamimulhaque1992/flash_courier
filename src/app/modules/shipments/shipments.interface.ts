@@ -12,3 +12,7 @@ export interface ICreateShipmentPayload {
 	isFragile?: boolean;
 	note?: string;
 }
+
+export interface IRepayShipmentPayload {
+	shipmentId: string
+}

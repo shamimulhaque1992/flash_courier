@@ -15,7 +15,7 @@ router.post(
 );
 
 router.post(
-	"/pay",
+	"/re-pay",
 	auth(Role.MERCHANT),
 	ShipmentControllers.payForShipment,
 );

@@ -8,7 +8,7 @@ import { AppError } from "../../utils/AppError";
 import { generatePdf } from "../../utils/generatePdf";
 import { sendEmail } from "../../utils/sendEmail";
 import { calculateShipmentFee } from "../../utils/shipmentPricing";
-import type { ICreateShipmentPayload } from "./shipments.interface";
+import type { ICreateShipmentPayload, IRepayShipmentPayload } from "./shipments.interface";
 
 const generateTrackingNumber = () => {
   const timestamp = Date.now().toString(36).toUpperCase();
@@ -116,167 +116,182 @@ const createShipment = async (
 };
 
 const shipmentPaymentCallback = async (query: Record<string, string>) => {
-  return prisma.$transaction(async (tx) => {
-    const { paymentID: paymentId, status } = query;
+  const { paymentID: paymentId, status } = query;
 
-    if (!paymentId) {
-      throw new AppError(httpStatus.BAD_REQUEST, "Payment ID missing");
-    }
-    if (!status) {
-      throw new AppError(httpStatus.BAD_REQUEST, "Payment status missing");
-    }
+  if (!paymentId) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Payment ID missing");
+  }
+  if (!status) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Payment status missing");
+  }
 
-    const bkashIdToken = await getBkashIdToken();
-    if (!bkashIdToken) {
-      throw new AppError(httpStatus.BAD_GATEWAY, "No Bkash access token found");
-    }
-
-    const bkashExecuteResponse = await fetch(
-      `${config.bkash_app_base_url}/tokenized/checkout/execute`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          authorization: bkashIdToken,
-          "x-app-key": config.bkash_app_key,
-        },
-        body: JSON.stringify({ paymentID: paymentId }),
-      },
-    );
-
-    if (!bkashExecuteResponse.ok) {
-      throw new AppError(httpStatus.BAD_GATEWAY, "Bkash execute failed!");
-    }
-
-    const bkashExecuteResult = await bkashExecuteResponse.json();
-
-    if (status === "success") {
-      const shipment = await tx.shipments.update({
-        where: { id: bkashExecuteResult.merchantInvoiceNumber },
-        data: {
-          shipmentStatus: ShipmentStatus.PAID,
-          paymentStatus: PaymentStatus.PAID,
-        },
-        include: { merchant: true },
-      });
-
-      await tx.payments.update({
-        where: {
-          shipmentId: bkashExecuteResult.merchantInvoiceNumber,
-          bkashPaymentId: paymentId,
-        },
-        data: {
-          status: PaymentStatus.PAID,
-          bkashTrxId: bkashExecuteResult.trxID,
-          paidAt: new Date(bkashExecuteResult.paymentExecuteTime),
-          gatewayResponse: bkashExecuteResult,
-        },
-      });
-
-      const invoicePdf = await generatePdf((doc) => {
-        doc.fontSize(20).text("Flash Courier", { align: "center" });
-        doc.fontSize(14).text("Shipment Invoice", { align: "center" });
-        doc.moveDown(2);
-
-        doc.fontSize(12).text(`Merchant: ${shipment.merchant.name}`);
-        doc.text(`Merchant Email: ${shipment.merchant.email}`);
-        doc.moveDown();
-
-        doc.text(`Tracking Number: ${shipment.trackingNumber}`);
-        doc.moveDown();
-
-        doc.text("Receiver Information:");
-        doc.text(`  Name: ${shipment.receiverName}`);
-        doc.text(`  Email: ${shipment.receiverEmail}`);
-        doc.text(`  Contact: ${shipment.receiverContactNumber}`);
-        doc.text(
-          `  Address: ${shipment.receiverThana}, ${shipment.receiverDistrict}, ${shipment.receiverDivision}`,
+  // bkash execute + all DB updates inside one transaction with increased timeout.
+  // If bkash execute succeeds but a DB write fails, the transaction rolls back —
+  // the payment record stays PENDING so the merchant can retry via payForShipment.
+  // PDF and email are outside because they are slow and non-critical.
+  const { shipment, bkashExecuteResult } = await prisma.$transaction(
+    async (tx) => {
+      const bkashIdToken = await getBkashIdToken();
+      if (!bkashIdToken) {
+        throw new AppError(
+          httpStatus.BAD_GATEWAY,
+          "No Bkash access token found",
         );
-        if (shipment.receiverAddress) {
-          doc.text(`  Full Address: ${shipment.receiverAddress}`);
-        }
-        doc.moveDown();
+      }
 
-        doc.text("Package Information:");
-        if (shipment.packageWeight) {
-          doc.text(`  Weight: ${shipment.packageWeight} kg`);
-        }
-        if (shipment.packageDimensions) {
-          doc.text(`  Dimensions: ${shipment.packageDimensions}`);
-        }
-        if (shipment.packageDescription) {
-          doc.text(`  Description: ${shipment.packageDescription}`);
-        }
-        doc.text(`  Fragile: ${shipment.isFragile ? "Yes" : "No"}`);
-        doc.moveDown();
-
-        doc.text("Payment Information:");
-        doc.text(`  Delivery Fee: ${shipment.deliveryFee} BDT`);
-        doc.text(`  Payment Method: bKash`);
-        doc.text(`  Transaction ID: ${bkashExecuteResult.trxID}`);
-        doc.text(`  Paid At: ${bkashExecuteResult.paymentExecuteTime}`);
-      });
-
-      const templateData = {
-        merchantName: shipment.merchant.name,
-        trackingNumber: shipment.trackingNumber,
-        receiverName: shipment.receiverName,
-        receiverDistrict: shipment.receiverDistrict,
-        receiverDivision: shipment.receiverDivision,
-        packageWeight: shipment.packageWeight ?? "N/A",
-        deliveryFee: shipment.deliveryFee.toString(),
-        trxId: bkashExecuteResult.trxID,
-      };
-
-      await sendEmail("shipment-payment-success.ejs", templateData, {
-        from: config.email_sender,
-        to: shipment.merchant.email,
-        subject: "Shipment Payment Confirmed — Flash Courier",
-        attachments: [
-          { filename: "shipment_invoice.pdf", content: invoicePdf },
-        ],
-      });
-
-      return {
-        redirectUrl: `${config.frontend_url}/dashboard/shipments?status=success`,
-      };
-    }
-
-    if (status === "failure") {
-      await tx.payments.update({
-        where: { bkashPaymentId: paymentId },
-        data: {
-          status: PaymentStatus.FAILED,
-          gatewayResponse: bkashExecuteResult,
+      const bkashExecuteResponse = await fetch(
+        `${config.bkash_app_base_url}/tokenized/checkout/execute`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            authorization: bkashIdToken,
+            "x-app-key": config.bkash_app_key,
+          },
+          body: JSON.stringify({ paymentID: paymentId }),
         },
-      });
-      return {
-        redirectUrl: `${config.frontend_url}/dashboard/shipments?status=failure`,
-      };
-    }
+      );
 
-    if (status === "cancel") {
-      await tx.payments.update({
-        where: { bkashPaymentId: paymentId },
-        data: {
-          status: PaymentStatus.FAILED,
-          gatewayResponse: bkashExecuteResult,
-        },
-      });
-      return {
-        redirectUrl: `${config.frontend_url}/dashboard/shipments?status=cancel`,
-      };
-    }
+      if (!bkashExecuteResponse.ok) {
+        throw new AppError(httpStatus.BAD_GATEWAY, "Bkash execute failed!");
+      }
 
+      const bkashExecuteResult = await bkashExecuteResponse.json();
+
+      if (status === "success") {
+        const shipment = await tx.shipments.update({
+          where: { id: bkashExecuteResult.merchantInvoiceNumber },
+          data: {
+            shipmentStatus: ShipmentStatus.PAID,
+            paymentStatus: PaymentStatus.PAID,
+          },
+          include: { merchant: true },
+        });
+
+        await tx.payments.update({
+          where: {
+            shipmentId: bkashExecuteResult.merchantInvoiceNumber,
+            bkashPaymentId: paymentId,
+          },
+          data: {
+            status: PaymentStatus.PAID,
+            bkashTrxId: bkashExecuteResult.trxID,
+            paidAt: bkashExecuteResult.paymentExecuteTime,
+            gatewayResponse: bkashExecuteResult,
+          },
+        });
+
+        return { shipment, bkashExecuteResult };
+      }
+
+      else if (status === "failure") {
+        await tx.payments.update({
+          where: { bkashPaymentId: paymentId },
+          data: {
+            status: PaymentStatus.FAILED,
+            gatewayResponse: bkashExecuteResult,
+          },
+        });
+        return { shipment: null, bkashExecuteResult };
+      }
+
+      else if (status === "cancel") {
+        await tx.payments.update({
+          where: { bkashPaymentId: paymentId },
+          data: {
+            status: PaymentStatus.FAILED,
+            gatewayResponse: bkashExecuteResult,
+          },
+        });
+        return { shipment: null, bkashExecuteResult };
+      }
+
+      return { shipment: null, bkashExecuteResult };
+    },
+    { timeout: 15000 },
+  );
+
+  if (status !== "success" || !shipment) {
+    const redirectStatus =
+      status === "failure" || status === "cancel"
+        ? status
+        : "error=payment-failed";
     return {
-      redirectUrl: `${config.frontend_url}/dashboard/shipments?error=payment-failed`,
+      redirectUrl: `${config.frontend_url}/dashboard/shipments?status=${redirectStatus}`,
     };
+  }
+
+  // PDF + email outside the transaction — DB is already committed at this point.
+  // If email fails the payment is still recorded correctly.
+  const invoicePdf = await generatePdf((doc) => {
+    doc.fontSize(20).text("Flash Courier", { align: "center" });
+    doc.fontSize(14).text("Shipment Invoice", { align: "center" });
+    doc.moveDown(2);
+
+    doc.fontSize(12).text(`Merchant: ${shipment.merchant.name}`);
+    doc.text(`Merchant Email: ${shipment.merchant.email}`);
+    doc.moveDown();
+
+    doc.text(`Tracking Number: ${shipment.trackingNumber}`);
+    doc.moveDown();
+
+    doc.text("Receiver Information:");
+    doc.text(`  Name: ${shipment.receiverName}`);
+    doc.text(`  Email: ${shipment.receiverEmail}`);
+    doc.text(`  Contact: ${shipment.receiverContactNumber}`);
+    doc.text(
+      `  Address: ${shipment.receiverThana}, ${shipment.receiverDistrict}, ${shipment.receiverDivision}`,
+    );
+    if (shipment.receiverAddress) {
+      doc.text(`  Full Address: ${shipment.receiverAddress}`);
+    }
+    doc.moveDown();
+
+    doc.text("Package Information:");
+    if (shipment.packageWeight)
+      doc.text(`  Weight: ${shipment.packageWeight} kg`);
+    if (shipment.packageDimensions)
+      doc.text(`  Dimensions: ${shipment.packageDimensions}`);
+    if (shipment.packageDescription)
+      doc.text(`  Description: ${shipment.packageDescription}`);
+    doc.text(`  Fragile: ${shipment.isFragile ? "Yes" : "No"}`);
+    doc.moveDown();
+
+    doc.text("Payment Information:");
+    doc.text(`  Delivery Fee: ${shipment.deliveryFee} BDT`);
+    doc.text(`  Payment Method: bKash`);
+    doc.text(`  Transaction ID: ${bkashExecuteResult.trxID}`);
+    doc.text(`  Paid At: ${bkashExecuteResult.paymentExecuteTime}`);
   });
+
+  await sendEmail(
+    "shipment-payment-success.ejs",
+    {
+      merchantName: shipment.merchant.name,
+      trackingNumber: shipment.trackingNumber,
+      receiverName: shipment.receiverName,
+      receiverDistrict: shipment.receiverDistrict,
+      receiverDivision: shipment.receiverDivision,
+      packageWeight: shipment.packageWeight ?? "N/A",
+      deliveryFee: shipment.deliveryFee.toString(),
+      trxId: bkashExecuteResult.trxID,
+    },
+    {
+      from: config.email_sender,
+      to: shipment.merchant.email,
+      subject: "Shipment Payment Confirmed — Flash Courier",
+      attachments: [{ filename: "shipment_invoice.pdf", content: invoicePdf }],
+    },
+  );
+
+  return {
+    redirectUrl: `${config.frontend_url}/dashboard/shipments?status=success`,
+  };
 };
 
 const payForShipment = async (
-  payload: { shipmentId: string },
+  payload: IRepayShipmentPayload,
   user: RequestUser,
 ) => {
   const shipment = await prisma.shipments.findUnique({

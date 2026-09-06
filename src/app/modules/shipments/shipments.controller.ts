@@ -69,10 +69,112 @@ const markShipmentDelivered = catchAsync(
 	},
 );
 
+const cancelShipment = catchAsync(
+	async (req: Request, res: Response, _next: NextFunction) => {
+		const result = await ShipmentServices.cancelShipment(req.body, req.user!);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Shipment cancelled successfully",
+			data: result,
+		});
+	},
+);
+
+const updateShipmentStatus = catchAsync(
+	async (req: Request, res: Response, _next: NextFunction) => {
+		const result = await ShipmentServices.updateShipmentStatus(
+			req.params.shipmentId as string,
+			req.body,
+			req.user!,
+		);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Shipment status updated successfully",
+			data: result,
+		});
+	},
+);
+
+const getMerchantShipments = catchAsync(
+	async (req: Request, res: Response, _next: NextFunction) => {
+		const { data, meta } = await ShipmentServices.getMerchantShipments(req.query, req.user!);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Shipments retrieved successfully",
+			data,
+			meta,
+		});
+	},
+);
+
+const getCustomerShipments = catchAsync(
+	async (req: Request, res: Response, _next: NextFunction) => {
+		const { data, meta } = await ShipmentServices.getCustomerShipments(req.query, req.user!);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Shipments retrieved successfully",
+			data,
+			meta,
+		});
+	},
+);
+
+const getRiderShipments = catchAsync(
+	async (req: Request, res: Response, _next: NextFunction) => {
+		const { data, meta } = await ShipmentServices.getRiderShipments(req.query, req.user!);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Shipments retrieved successfully",
+			data,
+			meta,
+		});
+	},
+);
+
+const getAllShipments = catchAsync(
+	async (req: Request, res: Response, _next: NextFunction) => {
+		const { data, meta } = await ShipmentServices.getAllShipments(req.query);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "All shipments retrieved successfully",
+			data,
+			meta,
+		});
+	},
+);
+
+const getSingleShipment = catchAsync(
+	async (req: Request, res: Response, _next: NextFunction) => {
+		const result = await ShipmentServices.getSingleShipment(
+			req.params.shipmentId as string,
+			req.user!,
+		);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Shipment retrieved successfully",
+			data: result,
+		});
+	},
+);
+
 export const ShipmentControllers = {
 	createShipment,
 	shipmentPaymentCallback,
 	payForShipment,
 	assignShipment,
 	markShipmentDelivered,
+	cancelShipment,
+	updateShipmentStatus,
+	getMerchantShipments,
+	getCustomerShipments,
+	getRiderShipments,
+	getAllShipments,
+	getSingleShipment,
 };

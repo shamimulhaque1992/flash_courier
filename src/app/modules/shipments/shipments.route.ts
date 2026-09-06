@@ -39,4 +39,53 @@ router.patch(
 	ShipmentControllers.markShipmentDelivered,
 );
 
+// Merchant cancels shipment
+router.patch(
+	"/cancel",
+	auth(Role.MERCHANT),
+	ShipmentControllers.cancelShipment,
+);
+
+// Admin updates shipment status
+router.patch(
+	"/status/:shipmentId",
+	auth(Role.ADMIN, Role.SUPER_ADMIN),
+	ShipmentControllers.updateShipmentStatus,
+);
+
+// Merchant views their shipments
+router.get(
+	"/my-shipments",
+	auth(Role.MERCHANT),
+	ShipmentControllers.getMerchantShipments,
+);
+
+// Customer views shipments addressed to them
+router.get(
+	"/my-deliveries",
+	auth(Role.CUSTOMER),
+	ShipmentControllers.getCustomerShipments,
+);
+
+// Rider views their assigned shipments
+router.get(
+	"/my-assignments",
+	auth(Role.RIDER),
+	ShipmentControllers.getRiderShipments,
+);
+
+// Admin views all shipments
+router.get(
+	"/all",
+	auth(Role.ADMIN, Role.SUPER_ADMIN),
+	ShipmentControllers.getAllShipments,
+);
+
+// Single shipment — all authorized roles
+router.get(
+	"/:shipmentId",
+	auth(Role.MERCHANT, Role.RIDER, Role.CUSTOMER, Role.ADMIN, Role.SUPER_ADMIN),
+	ShipmentControllers.getSingleShipment,
+);
+
 export const ShipmentRoutes = router;

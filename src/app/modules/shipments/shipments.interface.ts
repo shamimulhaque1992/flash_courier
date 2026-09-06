@@ -1,3 +1,12 @@
+export interface IUpdateShipmentStatusPayload {
+	status: string;
+	remarks?: string;
+}
+
+export interface ICancelShipmentPayload {
+	shipmentId: string;
+}
+
 export interface ICreateShipmentPayload {
 	receiverName: string;
 	receiverEmail: string;

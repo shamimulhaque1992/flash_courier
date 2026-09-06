@@ -37,8 +37,42 @@ const payForShipment = catchAsync(
 	},
 );
 
+const assignShipment = catchAsync(
+	async (req: Request, res: Response, _next: NextFunction) => {
+		const result = await ShipmentServices.assignShipment(
+			req.body.shipmentId,
+			req.body.scheduleId,
+			req.user!,
+		);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Shipment assigned to rider successfully",
+			data: result,
+		});
+	},
+);
+
+const markShipmentDelivered = catchAsync(
+	async (req: Request, res: Response, _next: NextFunction) => {
+		const result = await ShipmentServices.markShipmentDelivered(
+			req.params.shipmentId as string,
+			req.body.otp,
+			req.user!,
+		);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: result.message,
+			data: null,
+		});
+	},
+);
+
 export const ShipmentControllers = {
 	createShipment,
 	shipmentPaymentCallback,
 	payForShipment,
+	assignShipment,
+	markShipmentDelivered,
 };

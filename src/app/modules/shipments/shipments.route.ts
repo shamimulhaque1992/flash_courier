@@ -25,4 +25,18 @@ router.get(
 	ShipmentControllers.shipmentPaymentCallback,
 );
 
+// Admin assigns a shipment to a rider's schedule
+router.post(
+	"/assign",
+	auth(Role.ADMIN, Role.SUPER_ADMIN),
+	ShipmentControllers.assignShipment,
+);
+
+// Rider marks shipment as delivered using customer OTP
+router.patch(
+	"/deliver/:shipmentId",
+	auth(Role.RIDER),
+	ShipmentControllers.markShipmentDelivered,
+);
+
 export const ShipmentRoutes = router;

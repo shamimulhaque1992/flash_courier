@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Shipment Assigned</title>
+  </head>
+  <body style="margin:0;padding:0;background-color:#f4f7fb;font-family:Arial,Helvetica,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f7fb;padding:40px 20px;">
+      <tr>
+        <td align="center">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0"
+            style="max-width:560px;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+
+            <!-- Header -->
+            <tr>
+              <td style="background-color:#f97316;padding:30px;text-align:center;">
+                <h1 style="margin:0;color:#ffffff;font-size:24px;">New Delivery Assigned</h1>
+              </td>
+            </tr>
+
+            <!-- Content -->
+            <tr>
+              <td style="padding:40px 35px;">
+                <p style="margin:0 0 18px;color:#1f2937;font-size:16px;">
+                  Hello <strong><%= riderName %></strong>,
+                </p>
+                <p style="margin:0 0 25px;color:#4b5563;font-size:15px;line-height:1.6;">
+                  You have been assigned a new shipment for delivery. Please find the delivery details below.
+                </p>
+
+                <!-- Delivery Details -->
+                <div style="background-color:#f8fafc;border-radius:10px;padding:20px;margin:25px 0;">
+                  <p style="margin:0 0 15px;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Delivery Details</p>
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td style="padding:8px 0;color:#64748b;font-size:14px;">Tracking Number</td>
+                      <td align="right" style="padding:8px 0;color:#f97316;font-size:14px;font-weight:bold;"><%= trackingNumber %></td>
+                    </tr>
+                    <tr>
+                      <td style="padding:8px 0;color:#64748b;font-size:14px;">Probable Delivery</td>
+                      <td align="right" style="padding:8px 0;color:#1f2937;font-size:14px;font-weight:bold;"><%= probableDeliveryTime %></td>
+                    </tr>
+                  </table>
+                </div>
+
+                <!-- Receiver Address -->
+                <div style="background-color:#f8fafc;border-radius:10px;padding:20px;margin:25px 0;">
+                  <p style="margin:0 0 15px;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Receiver Address</p>
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td style="padding:8px 0;color:#64748b;font-size:14px;">Name</td>
+                      <td align="right" style="padding:8px 0;color:#1f2937;font-size:14px;font-weight:bold;"><%= receiverName %></td>
+                    </tr>
+                    <tr>
+                      <td style="padding:8px 0;color:#64748b;font-size:14px;">Contact</td>
+                      <td align="right" style="padding:8px 0;color:#1f2937;font-size:14px;font-weight:bold;"><%= receiverContactNumber %></td>
+                    </tr>
+                    <tr>
+                      <td style="padding:8px 0;color:#64748b;font-size:14px;">Thana</td>
+                      <td align="right" style="padding:8px 0;color:#1f2937;font-size:14px;font-weight:bold;"><%= receiverThana %></td>
+                    </tr>
+                    <tr>
+                      <td style="padding:8px 0;color:#64748b;font-size:14px;">District</td>
+                      <td align="right" style="padding:8px 0;color:#1f2937;font-size:14px;font-weight:bold;"><%= receiverDistrict %></td>
+                    </tr>
+                    <tr>
+                      <td style="padding:8px 0;color:#64748b;font-size:14px;">Division</td>
+                      <td align="right" style="padding:8px 0;color:#1f2937;font-size:14px;font-weight:bold;"><%= receiverDivision %></td>
+                    </tr>
+                    <% if (receiverAddress) { %>
+                    <tr>
+                      <td style="padding:8px 0;color:#64748b;font-size:14px;">Full Address</td>
+                      <td align="right" style="padding:8px 0;color:#1f2937;font-size:14px;font-weight:bold;"><%= receiverAddress %></td>
+                    </tr>
+                    <% } %>
+                  </table>
+                </div>
+
+                <!-- Delivery Fee -->
+                <div style="background-color:#fff7ed;border-radius:10px;padding:20px;margin:25px 0;text-align:center;">
+                  <p style="margin:0 0 6px;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Total Delivery Fee</p>
+                  <p style="margin:0;color:#f97316;font-size:32px;font-weight:bold;"><%= deliveryFee %> BDT</p>
+                </div>
+
+                <div style="background-color:#fefce8;border-left:4px solid #eab308;padding:15px 18px;margin:25px 0;">
+                  <p style="margin:0;color:#475569;font-size:13px;line-height:1.6;">
+                    <strong>Reminder:</strong> Ask the customer for their delivery OTP when you arrive. You will need it to confirm the delivery.
+                  </p>
+                </div>
+
+                <p style="margin:25px 0 0;color:#6b7280;font-size:13px;line-height:1.6;text-align:center;">
+                  Thank you for delivering with Flash Courier.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="background-color:#f8fafc;padding:20px 30px;text-align:center;border-top:1px solid #e5e7eb;">
+                <p style="margin:0;color:#94a3b8;font-size:12px;">This is an automated email. Please do not reply.</p>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

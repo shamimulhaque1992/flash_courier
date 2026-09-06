@@ -1,11 +1,12 @@
-import type { RiderScheduleStatus } from "../../../generated/prisma";
+import type { DayOfWeek } from "../../../generated/prisma/enums";
 
-export interface IRiderSchedule {
-	id: string;
-	startDateTime: Date;
-	endDateTime: Date;
-	totalSlots: number;
-	availableSlots: number;
-	status: RiderScheduleStatus;
-	riderId: string;
+export interface ICreateRiderSchedulePayload {
+	dayOfWeek: DayOfWeek;
+	startTime: string; // "HH:MM" e.g. "10:00"
+	endTime: string;   // "HH:MM" e.g. "19:00"
+}
+
+export interface IUpdateRiderSchedulePayload {
+	startTime?: string;
+	endTime?: string;
 }

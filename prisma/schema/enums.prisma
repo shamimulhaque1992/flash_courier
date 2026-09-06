@@ -36,6 +36,16 @@ enum RiderScheduleStatus {
   COMPLETED
 }
 
+enum DayOfWeek {
+  SATURDAY
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+}
+
 enum PaymentStatus {
   PENDING
   PAID

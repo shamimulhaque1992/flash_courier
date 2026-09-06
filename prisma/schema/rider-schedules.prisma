@@ -1,7 +1,8 @@
 model RiderSchedules {
     id             String              @id @default(uuid())
-    startDateTime  DateTime
-    endDateTime    DateTime
+    dayOfWeek      DayOfWeek
+    startTime      String
+    endTime        String
     totalSlots     Int
     availableSlots Int
     status         RiderScheduleStatus @default(DRAFT)
@@ -12,6 +13,8 @@ model RiderSchedules {
     riderId        String
     rider          Riders              @relation(fields: [riderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-    @@unique([riderId, startDateTime, endDateTime], name: "unique_rider_schedule")
+    shipments Shipments[]
+
+    @@unique([riderId, dayOfWeek], name: "unique_rider_day_schedule")
     @@map("rider_schedules")
 }

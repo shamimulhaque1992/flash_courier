@@ -1,6 +1,7 @@
 model Shipments {
     id                    String         @id @default(uuid())
     trackingNumber        String         @unique
+    otp                   String?         @unique
     receiverName          String
     receiverEmail         String
     receiverContactNumber String
@@ -31,6 +32,8 @@ model Shipments {
     customer   Customers? @relation(fields: [customerId], references: [id], onDelete: SetNull, onUpdate: Cascade)
     riderId    String?
     rider      Riders?    @relation(fields: [riderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    scheduleId String?
+    schedule   RiderSchedules? @relation(fields: [scheduleId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
     payment         Payments?
     shipmentHistory ShipmentHistories[]

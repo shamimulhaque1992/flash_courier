@@ -1,8 +1,4 @@
-import type { PaymentStatus, ShipmentStatus } from "../../../generated/prisma";
-
-export interface IShipment {
-	id: string;
-	trackingNumber: string;
+export interface ICreateShipmentPayload {
 	receiverName: string;
 	receiverEmail: string;
 	receiverContactNumber: string;
@@ -11,16 +7,8 @@ export interface IShipment {
 	receiverDivision: string;
 	receiverAddress?: string;
 	packageDescription?: string;
-	packageWeight?: number;
+	packageWeight: number;
 	packageDimensions?: string;
-	deliveryFee: number;
-	paymentStatus: PaymentStatus;
-	shipmentStatus: ShipmentStatus;
+	isFragile?: boolean;
 	note?: string;
-	pickedUpAt?: Date;
-	probableDeliveryTime?: Date;
-	actualDeliveryTime?: Date;
-	merchantId: string;
-	customerId?: string;
-	riderId?: string;
 }

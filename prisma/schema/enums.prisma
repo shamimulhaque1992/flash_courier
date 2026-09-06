@@ -46,6 +46,7 @@ enum PaymentStatus {
 enum ShipmentStatus {
   PENDING_PAYMENT
   PAID
+  IN_TRANSIT
   READY_FOR_ASSIGNMENT
   ASSIGNED
   ACCEPTED_BY_RIDER

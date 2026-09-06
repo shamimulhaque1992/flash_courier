@@ -11,6 +11,7 @@ model Shipments {
     packageDescription    String?
     packageWeight         Float?
     packageDimensions     String?
+    isFragile             Boolean        @default(false)
     deliveryFee           Decimal        @db.Decimal(10, 2)
     paymentStatus         PaymentStatus  @default(PENDING)
     shipmentStatus        ShipmentStatus @default(PENDING_PAYMENT)
@@ -20,16 +21,16 @@ model Shipments {
     createdAt             DateTime       @default(now())
     updatedAt             DateTime       @updatedAt
 
-    pickedUpAt            DateTime?
-    probableDeliveryTime  DateTime?
-    actualDeliveryTime    DateTime?
+    pickedUpAt           DateTime?
+    probableDeliveryTime DateTime?
+    actualDeliveryTime   DateTime?
 
-    merchantId      String
-    merchant        Merchants  @relation(fields: [merchantId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-    customerId      String?
-    customer        Customers? @relation(fields: [customerId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-    riderId         String?
-    rider           Riders?    @relation(fields: [riderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    merchantId String
+    merchant   Merchants  @relation(fields: [merchantId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+    customerId String?
+    customer   Customers? @relation(fields: [customerId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    riderId    String?
+    rider      Riders?    @relation(fields: [riderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
     payment         Payments?
     shipmentHistory ShipmentHistories[]

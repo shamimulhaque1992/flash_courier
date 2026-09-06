@@ -6,12 +6,10 @@ interface EmailInfo {
 	from: string;
 	to: string;
 	subject: string;
-	attachments?: [
-		{
-			filename: string;
-			content: Buffer;
-		},
-	];
+	attachments?: {
+		filename: string;
+		content: Buffer;
+	}[];
 }
 export const sendEmail = async <T extends Record<string, unknown>>(
 	filePath: string,
@@ -31,5 +29,6 @@ export const sendEmail = async <T extends Record<string, unknown>>(
 		to,
 		subject,
 		html,
+		attachments: emailInfo.attachments,
 	});
 };

@@ -20,7 +20,6 @@ import type {
 	IGoogleLoginPayload,
 	ILoginUserPayload,
 	IRegisterCustomerPayload,
-	IRequestUser,
 	IResetPasswordPayload,
 	IVerifyEmailPayload,
 } from "./auth.interface";
@@ -256,25 +255,7 @@ const loginUser = async (payload: ILoginUserPayload) => {
 	};
 };
 
-const getMe = async (user: IRequestUser) => {
-	const isUserExists = await prisma.users.findUnique({
-		where: {
-			id: user.userId,
-		},
-		include: {
-			customers: true,
-		},
-		omit: {
-			password: true,
-		},
-	});
 
-	if (!isUserExists) {
-		throw new AppError(httpStatus.NOT_FOUND, "User not found");
-	}
-
-	return isUserExists;
-};
 
 const refreshToken = async (token: string) => {
 	const verifiedRefreshToken = jwtUtils.verifyToken(
@@ -614,7 +595,6 @@ export const AuthServices = {
 	registerCustomer,
 	verifyUserEmail,
 	loginUser,
-	getMe,
 	refreshToken,
 	forgotPassword,
 	resetPassword,

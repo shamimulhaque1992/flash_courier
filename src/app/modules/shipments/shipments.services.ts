@@ -169,9 +169,16 @@ const shipmentPaymentCallback = async (query: Record<string, string>) => {
 
       const bkashExecuteResult = await bkashExecuteResponse.json();
 
+      const payment = await tx.payments.findUnique({
+        where: { bkashPaymentId: paymentId },
+      });
+
+      if (!payment)
+        throw new AppError(httpStatus.NOT_FOUND, "Payment record not found");
+
       if (status === "success") {
         const shipment = await tx.shipments.update({
-          where: { id: bkashExecuteResult.merchantInvoiceNumber },
+          where: { id: payment.shipmentId },
           data: {
             shipmentStatus: ShipmentStatus.PAID,
             paymentStatus: PaymentStatus.PAID,
@@ -180,10 +187,7 @@ const shipmentPaymentCallback = async (query: Record<string, string>) => {
         });
 
         await tx.payments.update({
-          where: {
-            shipmentId: bkashExecuteResult.merchantInvoiceNumber,
-            bkashPaymentId: paymentId,
-          },
+          where: { bkashPaymentId: paymentId },
           data: {
             status: PaymentStatus.PAID,
             bkashTrxId: bkashExecuteResult.trxID,

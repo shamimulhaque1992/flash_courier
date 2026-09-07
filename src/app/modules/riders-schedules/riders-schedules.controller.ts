@@ -106,6 +106,21 @@ const publishSchedule = catchAsync(
 	},
 );
 
+const getScheduleSlots = catchAsync(
+	async (req: Request, res: Response, _next: NextFunction) => {
+		const result = await RiderScheduleServices.getScheduleSlots(
+			req.params.scheduleId as string,
+			req.user!,
+		);
+		sendResponse(res, {
+			statusCode: httpStatus.OK,
+			success: true,
+			message: "Schedule slots retrieved successfully",
+			data: result,
+		});
+	},
+);
+
 const deleteSchedule = catchAsync(
 	async (req: Request, res: Response, _next: NextFunction) => {
 		const result = await RiderScheduleServices.deleteSchedule(
@@ -127,6 +142,7 @@ export const RiderScheduleControllers = {
 	getAllSchedules,
 	getTodaysSchedules,
 	getScheduleById,
+	getScheduleSlots,
 	updateSchedule,
 	publishSchedule,
 	deleteSchedule,

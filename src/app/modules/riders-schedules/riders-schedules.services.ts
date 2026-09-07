@@ -11,6 +11,7 @@ import httpStatus from "http-status";
 import {
 	DayOfWeek,
 	RiderScheduleStatus,
+	ShipmentStatus,
 } from "../../../generated/prisma/enums";
 import type { RiderSchedulesWhereInput } from "../../../generated/prisma/models";
 import type { IQuery } from "../../interfaces";
@@ -204,7 +205,7 @@ const getAllSchedules = async (query: IQuery) => {
 				OR: [
 					{ name: { contains: query.searchTerm, mode: "insensitive" } },
 					{ email: { contains: query.searchTerm, mode: "insensitive" } },
-					{ division: { contains: query.searchTerm, mode: "insensitive" } },
+
 				],
 			},
 		});
@@ -361,6 +362,67 @@ const publishSchedule = async (scheduleId: string, user: RequestUser) => {
 	});
 };
 
+const getScheduleSlots = async (scheduleId: string, user: RequestUser) => {
+	const schedule = await prisma.riderSchedules.findUnique({
+		where: { id: scheduleId },
+		include: {
+			rider: { select: { name: true, email: true, contactNumber: true, userId: true } },
+			shipments: {
+				where: {
+					shipmentStatus: {
+						notIn: [ShipmentStatus.CANCELLED_BY_MERCHANT, ShipmentStatus.REJECTED_BY_RIDER],
+					},
+				},
+				orderBy: { probableDeliveryTime: "asc" },
+				select: {
+					id: true,
+					trackingNumber: true,
+					receiverName: true,
+					receiverDistrict: true,
+					receiverDivision: true,
+					shipmentStatus: true,
+					probableDeliveryTime: true,
+				},
+			},
+		},
+	});
+
+	if (!schedule || schedule.isDeleted)
+		throw new AppError(httpStatus.NOT_FOUND, "Schedule not found");
+
+	// Only admin or the owner rider can view slots
+	if (user.role === "RIDER" && schedule.rider.userId !== user.userId)
+		throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to view this schedule's slots");
+
+	const assignmentDate = getNextOccurrenceOfDay(schedule.dayOfWeek);
+
+	const slots = Array.from({ length: schedule.totalSlots }, (_, slotIndex) => {
+		const probableDeliveryTime = computeProbableDeliveryTime(
+			schedule.startTime,
+			slotIndex,
+			assignmentDate,
+		);
+		const shipment = schedule.shipments[slotIndex] ?? null;
+		return {
+			slotIndex,
+			probableDeliveryTime,
+			shipment,
+		};
+	});
+
+	return {
+		scheduleId: schedule.id,
+		dayOfWeek: schedule.dayOfWeek,
+		startTime: schedule.startTime,
+		endTime: schedule.endTime,
+		status: schedule.status,
+		totalSlots: schedule.totalSlots,
+		availableSlots: schedule.availableSlots,
+		rider: schedule.rider,
+		slots,
+	};
+};
+
 const deleteSchedule = async (scheduleId: string, user: RequestUser) => {
 	const rider = await getRiderOrThrow(user.userId);
 
@@ -395,6 +457,7 @@ export const RiderScheduleServices = {
 	getAllSchedules,
 	getTodaysSchedules,
 	getScheduleById,
+	getScheduleSlots,
 	updateSchedule,
 	publishSchedule,
 	deleteSchedule,

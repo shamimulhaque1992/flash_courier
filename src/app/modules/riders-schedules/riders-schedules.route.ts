@@ -45,6 +45,12 @@ router.patch(
 );
 
 router.get(
+	"/:scheduleId/slots",
+	auth(Role.RIDER, Role.ADMIN, Role.SUPER_ADMIN),
+	RiderScheduleControllers.getScheduleSlots,
+);
+
+router.get(
 	"/:scheduleId",
 	auth(Role.RIDER, Role.ADMIN, Role.SUPER_ADMIN),
 	RiderScheduleControllers.getScheduleById,

@@ -10,6 +10,7 @@ import httpStatus from "http-status";
 import config from "./app/config";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
+import { AnalyticsRoutes } from "./app/modules/analytics/analytics.route";
 import { PaymentRoutes } from "./app/modules/payments/payments.route";
 import { AuthRoutes } from "./app/modules/auth/auth.route";
 import { MerchantRoutes } from "./app/modules/merchants/merchants.route";
@@ -41,6 +42,7 @@ app.use("/api/v1/riders", RiderRoutes);
 app.use("/api/v1/shipments", ShipmentRoutes);
 app.use("/api/v1/rider-schedules", RiderScheduleRoutes);
 app.use("/api/v1/payments", PaymentRoutes);
+app.use("/api/v1/analytics", AnalyticsRoutes);
 
 // Basic route
 app.get("/", async (_req: Request, res: Response) => {

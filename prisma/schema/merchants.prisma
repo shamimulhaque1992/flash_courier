@@ -5,7 +5,7 @@ model Merchants {
     contactNumber                   String?
     thana                           String
     district                        String
-    division                        String
+    division                        Division
     address                         String?
     businessLicenseNumber           String                     @unique
     businessType                    String

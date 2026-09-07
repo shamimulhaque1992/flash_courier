@@ -4,6 +4,30 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { ShipmentServices } from "./shipments.services";
 
+const calculateDeliveryPrice = catchAsync(
+	async (req: Request, res: Response, _next: NextFunction) => {
+		const result = await ShipmentServices.calculateDeliveryPrice(req.body);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Delivery price calculated successfully",
+			data: result,
+		});
+	},
+);
+
+const trackShipment = catchAsync(
+	async (req: Request, res: Response, _next: NextFunction) => {
+		const result = await ShipmentServices.trackShipment(req.body.trackingNumber, req.user!);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Shipment tracked successfully",
+			data: result,
+		});
+	},
+);
+
 const createShipment = catchAsync(
 	async (req: Request, res: Response, _next: NextFunction) => {
 		const result = await ShipmentServices.createShipment(req.body, req.user!);
@@ -181,6 +205,8 @@ const getSingleShipment = catchAsync(
 );
 
 export const ShipmentControllers = {
+	calculateDeliveryPrice,
+	trackShipment,
 	createShipment,
 	shipmentPaymentCallback,
 	payForShipment,

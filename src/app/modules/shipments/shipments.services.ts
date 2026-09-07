@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { addMinutes, format } from "date-fns";
 import httpStatus from "http-status";
 import {
+  Division,
   PaymentStatus,
   RiderScheduleStatus,
   ShipmentStatus,
@@ -36,6 +37,45 @@ const generateTrackingNumber = () => {
 };
 
 const generateOtp = () => crypto.randomInt(100000, 1000000).toString();
+
+const calculateDeliveryPrice = async (
+  payload: { senderDivision: Division; receiverDivision: Division; packageWeight: number; isFragile?: boolean },
+) => {
+  return calculateShipmentFee({
+    senderDivision: payload.senderDivision,
+    receiverDivision: payload.receiverDivision,
+    weightKg: payload.packageWeight,
+    isFragile: payload.isFragile,
+  });
+};
+
+const trackShipment = async (trackingNumber: string, user: RequestUser) => {
+  const shipment = await prisma.shipments.findUnique({
+    where: { trackingNumber },
+    select: {
+      trackingNumber: true,
+      shipmentStatus: true,
+      paymentStatus: true,
+      receiverName: true,
+      receiverEmail: true,
+      receiverDistrict: true,
+      receiverDivision: true,
+      probableDeliveryTime: true,
+      actualDeliveryTime: true,
+      createdAt: true,
+      rider: { select: { name: true, contactNumber: true } },
+      shipmentHistory: { orderBy: { updatedAt: "asc" }, select: { status: true, remarks: true, updatedAt: true } },
+    },
+  });
+
+  if (!shipment)
+    throw new AppError(httpStatus.NOT_FOUND, "Shipment not found");
+
+  if (shipment.receiverEmail !== user.email)
+    throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to track this shipment");
+
+  return shipment;
+};
 
 const createShipment = async (
   payload: ICreateShipmentPayload,
@@ -671,9 +711,7 @@ const cancelShipment = async (
         "Cannot cancel a delivered shipment",
       );
 
-    const isInterDivision =
-      shipment.merchant.division.trim().toLowerCase() !==
-      shipment.receiverDivision.trim().toLowerCase();
+    const isInterDivision = shipment.merchant.division !== shipment.receiverDivision;
 
     // Same division: cancellable until ASSIGNED
     // Inter division: cancellable until IN_TRANSIT
@@ -1111,14 +1149,13 @@ const applyCommonFilters = (
         {
           receiverDistrict: { contains: query.searchTerm, mode: "insensitive" },
         },
-        {
-          receiverDivision: { contains: query.searchTerm, mode: "insensitive" },
-        },
       ],
     });
 };
 
 export const ShipmentServices = {
+  calculateDeliveryPrice,
+  trackShipment,
   createShipment,
   shipmentPaymentCallback,
   payForShipment,

@@ -9,7 +9,7 @@ model Riders {
     additionalDocuments       Json?
     thana                     String
     district                  String
-    division                  String
+    division                  Division
     address                   String?
     licenseNumber             String?
     vehicleType               String?

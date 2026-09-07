@@ -1,3 +1,14 @@
+enum Division {
+  DHAKA
+  CHATTOGRAM
+  RAJSHAHI
+  KHULNA
+  BARISHAL
+  SYLHET
+  RANGPUR
+  MYMENSINGH
+}
+
 enum Role {
   SUPER_ADMIN
   ADMIN

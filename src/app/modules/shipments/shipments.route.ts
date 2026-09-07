@@ -7,6 +7,21 @@ import { ShipmentValidations } from "./shipments.validation";
 
 const router = Router();
 
+// Public — merchant can calculate delivery price without auth (for embedding in their own website)
+router.post(
+	"/calculate-price",
+	validateRequest(ShipmentValidations.CalculateDeliveryPriceZodSchema),
+	ShipmentControllers.calculateDeliveryPrice,
+);
+
+// Customer tracks their shipment by tracking number
+router.post(
+	"/track",
+	auth(Role.CUSTOMER),
+	validateRequest(ShipmentValidations.TrackShipmentZodSchema),
+	ShipmentControllers.trackShipment,
+);
+
 router.post(
 	"/create-shipment",
 	auth(Role.MERCHANT),

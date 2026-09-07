@@ -1,3 +1,6 @@
+import { Division } from "../../../generated/prisma/enums";
+
+
 export interface IUpdateShipmentStatusPayload {
 	status: string;
 	remarks?: string;
@@ -13,7 +16,7 @@ export interface ICreateShipmentPayload {
 	receiverContactNumber: string;
 	receiverThana: string;
 	receiverDistrict: string;
-	receiverDivision: string;
+	receiverDivision: Division;
 	receiverAddress?: string;
 	packageDescription?: string;
 	packageWeight: number;
@@ -23,5 +26,5 @@ export interface ICreateShipmentPayload {
 }
 
 export interface IRepayShipmentPayload {
-	shipmentId: string
+	shipmentId: string;
 }

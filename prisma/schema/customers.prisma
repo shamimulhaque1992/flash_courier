@@ -5,7 +5,7 @@ model Customers {
     contactNumber String?
     thana        String?
     district     String?
-    division     String?
+    division     Division?
     address       String?
     isDeleted     Boolean   @default(false)
     deletedAt     DateTime?

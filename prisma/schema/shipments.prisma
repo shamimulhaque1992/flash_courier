@@ -7,7 +7,7 @@ model Shipments {
     receiverContactNumber String
     receiverThana         String
     receiverDistrict      String
-    receiverDivision      String
+    receiverDivision      Division
     receiverAddress       String?
     packageDescription    String?
     packageWeight         Float?

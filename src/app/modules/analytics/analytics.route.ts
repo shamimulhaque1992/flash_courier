@@ -17,11 +17,7 @@ router.get(
 	AnalyticsControllers.getMerchantAnalytics,
 );
 
-router.get(
-	"/rider",
-	auth(Role.RIDER),
-	AnalyticsControllers.getRiderAnalytics,
-);
+router.get("/rider", auth(Role.RIDER), AnalyticsControllers.getRiderAnalytics);
 
 router.get(
 	"/customer",

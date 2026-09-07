@@ -16,11 +16,23 @@ router.post(
 
 router.get("/my-reviews", auth(Role.CUSTOMER), ReviewControllers.getMyReviews);
 
-router.get("/merchant-reviews", auth(Role.MERCHANT), ReviewControllers.getMerchantReviews);
+router.get(
+	"/merchant-reviews",
+	auth(Role.MERCHANT),
+	ReviewControllers.getMerchantReviews,
+);
 
-router.get("/rider-reviews", auth(Role.RIDER), ReviewControllers.getRiderReviews);
+router.get(
+	"/rider-reviews",
+	auth(Role.RIDER),
+	ReviewControllers.getRiderReviews,
+);
 
-router.get("/all", auth(Role.ADMIN, Role.SUPER_ADMIN), ReviewControllers.getAllReviews);
+router.get(
+	"/all",
+	auth(Role.ADMIN, Role.SUPER_ADMIN),
+	ReviewControllers.getAllReviews,
+);
 
 router.patch(
 	"/:reviewId",

@@ -8,16 +8,16 @@ import { CreateAuditZodSchema } from "./audits.validation";
 const router = Router();
 
 router.post(
-  "/",
-  auth(Role.ADMIN, Role.SUPER_ADMIN),
-  validateRequest(CreateAuditZodSchema),
-  AuditControllers.publishAudit,
+	"/",
+	auth(Role.ADMIN, Role.SUPER_ADMIN),
+	validateRequest(CreateAuditZodSchema),
+	AuditControllers.publishAudit,
 );
 
 router.get(
-  "/:merchantId",
-  auth(Role.ADMIN, Role.SUPER_ADMIN),
-  AuditControllers.getMerchantAudits,
+	"/:merchantId",
+	auth(Role.ADMIN, Role.SUPER_ADMIN),
+	AuditControllers.getMerchantAudits,
 );
 
 export const AuditRoutes = router;

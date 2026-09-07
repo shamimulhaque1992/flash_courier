@@ -9,44 +9,40 @@ import { RiderValidations } from "./riders.validation";
 const router = Router();
 
 router.post(
-  "/apply-as-rider",
-  upload.fields([
-    { name: "nidDocument", maxCount: 1 },
-    { name: "additionalDocuments", maxCount: 5 },
-  ]),
-  RiderControllers.applyAsRider,
+	"/apply-as-rider",
+	upload.fields([
+		{ name: "nidDocument", maxCount: 1 },
+		{ name: "additionalDocuments", maxCount: 5 },
+	]),
+	RiderControllers.applyAsRider,
 );
 
 router.post(
-  "/verify-email",
-  validateRequest(RiderValidations.RiderEmailVerificationZodSchema),
-  RiderControllers.verifyRiderEmail,
+	"/verify-email",
+	validateRequest(RiderValidations.RiderEmailVerificationZodSchema),
+	RiderControllers.verifyRiderEmail,
 );
 
 router.patch(
-  "/approve",
-  auth(Role.ADMIN, Role.SUPER_ADMIN),
-  validateRequest(RiderValidations.RiderApplicationApprovalZodSchema),
-  RiderControllers.approveRiderApplication,
+	"/approve",
+	auth(Role.ADMIN, Role.SUPER_ADMIN),
+	validateRequest(RiderValidations.RiderApplicationApprovalZodSchema),
+	RiderControllers.approveRiderApplication,
 );
 
-router.get(
-  "/my-profile",
-  auth(Role.RIDER),
-  RiderControllers.getMyProfile,
-);
+router.get("/my-profile", auth(Role.RIDER), RiderControllers.getMyProfile);
 
 router.patch(
-  "/my-profile",
-  auth(Role.RIDER),
-  validateRequest(RiderValidations.UpdateRiderProfileZodSchema),
-  RiderControllers.updateMyProfile,
+	"/my-profile",
+	auth(Role.RIDER),
+	validateRequest(RiderValidations.UpdateRiderProfileZodSchema),
+	RiderControllers.updateMyProfile,
 );
 
 router.get(
-  "/",
-  auth(Role.ADMIN, Role.SUPER_ADMIN),
-  RiderControllers.getAllRiders,
+	"/",
+	auth(Role.ADMIN, Role.SUPER_ADMIN),
+	RiderControllers.getAllRiders,
 );
 
 export const RiderRoutes = router;

@@ -119,14 +119,15 @@ const getSinglePayment = async (paymentId: string, user: RequestUser) => {
 		include: {
 			shipment: {
 				include: {
-					merchant: { select: { id: true, name: true, email: true, userId: true } },
+					merchant: {
+						select: { id: true, name: true, email: true, userId: true },
+					},
 				},
 			},
 		},
 	});
 
-	if (!payment)
-		throw new AppError(httpStatus.NOT_FOUND, "Payment not found");
+	if (!payment) throw new AppError(httpStatus.NOT_FOUND, "Payment not found");
 
 	if (user.role === "MERCHANT") {
 		if (payment.shipment.merchant.userId !== user.userId)

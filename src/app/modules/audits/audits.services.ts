@@ -1,14 +1,13 @@
 import type { UploadApiResponse } from "cloudinary";
 import httpStatus from "http-status";
 import { PaymentStatus, ShipmentStatus } from "../../../generated/prisma/enums";
+import config from "../../config";
 import { cloudinary } from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
-import { sendEmail } from "../../utils/sendEmail";
 import type { RequestUser } from "../../middleware/checkAuth";
 import { AppError } from "../../utils/AppError";
 import { generatePdf } from "../../utils/generatePdf";
-import config from "../../config";
-
+import { sendEmail } from "../../utils/sendEmail";
 
 const publishAudit = async (
 	payload: { merchantId: string; startDate: string; endDate: string },
@@ -24,7 +23,10 @@ const publishAudit = async (
 	const end = new Date(payload.endDate);
 
 	if (start >= end)
-		throw new AppError(httpStatus.BAD_REQUEST, "startDate must be before endDate");
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"startDate must be before endDate",
+		);
 
 	const dateFilter = { gte: start, lte: end };
 
@@ -42,7 +44,11 @@ const publishAudit = async (
 		avgRatingResult,
 	] = await Promise.all([
 		prisma.shipments.count({
-			where: { merchantId: merchant.id, isDeleted: false, createdAt: dateFilter },
+			where: {
+				merchantId: merchant.id,
+				isDeleted: false,
+				createdAt: dateFilter,
+			},
 		}),
 		prisma.shipments.count({
 			where: {
@@ -106,7 +112,9 @@ const publishAudit = async (
 			},
 			_sum: { amount: true },
 		}),
-		prisma.reviews.count({ where: { merchantId: merchant.id, createdAt: dateFilter } }),
+		prisma.reviews.count({
+			where: { merchantId: merchant.id, createdAt: dateFilter },
+		}),
 		prisma.reviews.aggregate({
 			where: { merchantId: merchant.id, createdAt: dateFilter },
 			_avg: { merchantRating: true },
@@ -130,7 +138,9 @@ const publishAudit = async (
 		doc.fontSize(22).text("Flash Courier", { align: "center" });
 		doc.fontSize(16).text("Merchant Audit Report", { align: "center" });
 		doc.moveDown(0.5);
-		doc.fontSize(11).text(`Period: ${fmt(start)} — ${fmt(end)}`, { align: "center" });
+		doc
+			.fontSize(11)
+			.text(`Period: ${fmt(start)} — ${fmt(end)}`, { align: "center" });
 		doc.moveDown(2);
 
 		doc.fontSize(13).text("Merchant Information");
@@ -176,24 +186,35 @@ const publishAudit = async (
 		doc
 			.fontSize(10)
 			.fillColor("grey")
-			.text(`Report generated on ${new Date().toDateString()} by Flash Courier Admin`, {
-				align: "center",
-			});
+			.text(
+				`Report generated on ${new Date().toDateString()} by Flash Courier Admin`,
+				{
+					align: "center",
+				},
+			);
 	});
 
 	// --- Upload to Cloudinary ---
-	const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
-		cloudinary.uploader
-			.upload_stream({ resource_type: "raw", format: "pdf" }, (error, result) => {
-				if (error) return reject(error);
-				if (!result)
-					return reject(
-						new AppError(httpStatus.INTERNAL_SERVER_ERROR, "No result from Cloudinary"),
-					);
-				resolve(result);
-			})
-			.end(pdfBuffer);
-	});
+	const uploadResult = await new Promise<UploadApiResponse>(
+		(resolve, reject) => {
+			cloudinary.uploader
+				.upload_stream(
+					{ resource_type: "raw", format: "pdf" },
+					(error, result) => {
+						if (error) return reject(error);
+						if (!result)
+							return reject(
+								new AppError(
+									httpStatus.INTERNAL_SERVER_ERROR,
+									"No result from Cloudinary",
+								),
+							);
+						resolve(result);
+					},
+				)
+				.end(pdfBuffer);
+		},
+	);
 
 	// --- Save audit record ---
 	const audit = await prisma.merchantAudits.create({

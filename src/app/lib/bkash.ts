@@ -35,7 +35,10 @@ export const getBkashIdToken = async () => {
 			},
 		);
 		if (!refreshTokenResponse.ok) {
-			throw new AppError(httpStatus.BAD_GATEWAY, "Bkash refresh token api failed!");
+			throw new AppError(
+				httpStatus.BAD_GATEWAY,
+				"Bkash refresh token api failed!",
+			);
 		}
 		const refreshTokenResult = await refreshTokenResponse.json();
 		redisBkashIdToken = refreshTokenResult.id_token as string;
@@ -65,7 +68,10 @@ export const getBkashIdToken = async () => {
 		},
 	);
 	if (!response.ok) {
-		throw new AppError(httpStatus.BAD_GATEWAY, "Bkash Access Token Grant Failed");
+		throw new AppError(
+			httpStatus.BAD_GATEWAY,
+			"Bkash Access Token Grant Failed",
+		);
 	}
 	const result = await response.json();
 

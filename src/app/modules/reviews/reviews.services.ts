@@ -1,9 +1,9 @@
 import httpStatus from "http-status";
 import { ShipmentStatus } from "../../../generated/prisma/enums";
+import type { IQuery } from "../../interfaces";
 import { prisma } from "../../lib/prisma";
 import type { RequestUser } from "../../middleware/checkAuth";
 import { AppError } from "../../utils/AppError";
-import type { IQuery } from "../../interfaces";
 
 const createReview = async (
 	payload: {
@@ -23,19 +23,33 @@ const createReview = async (
 		throw new AppError(httpStatus.NOT_FOUND, "Shipment not found");
 
 	if (shipment.receiverEmail !== user.email)
-		throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to review this shipment");
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"You are not allowed to review this shipment",
+		);
 
 	if (shipment.shipmentStatus !== ShipmentStatus.DELIVERED)
-		throw new AppError(httpStatus.BAD_REQUEST, "You can only review a delivered shipment");
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"You can only review a delivered shipment",
+		);
 
 	if (shipment.reviews)
-		throw new AppError(httpStatus.CONFLICT, "You have already reviewed this shipment");
+		throw new AppError(
+			httpStatus.CONFLICT,
+			"You have already reviewed this shipment",
+		);
 
 	if (!shipment.riderId)
-		throw new AppError(httpStatus.BAD_REQUEST, "Shipment has no assigned rider to review");
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"Shipment has no assigned rider to review",
+		);
 
 	// Resolve customer profile (may be null — customer identified by email)
-	const customer = await prisma.customers.findUnique({ where: { userId: user.userId } });
+	const customer = await prisma.customers.findUnique({
+		where: { userId: user.userId },
+	});
 	if (!customer)
 		throw new AppError(httpStatus.NOT_FOUND, "Customer profile not found");
 
@@ -62,16 +76,20 @@ const updateReview = async (
 	payload: { merchantRating?: number; riderRating?: number; comment?: string },
 	user: RequestUser,
 ) => {
-	const customer = await prisma.customers.findUnique({ where: { userId: user.userId } });
+	const customer = await prisma.customers.findUnique({
+		where: { userId: user.userId },
+	});
 	if (!customer)
 		throw new AppError(httpStatus.NOT_FOUND, "Customer profile not found");
 
 	const review = await prisma.reviews.findUnique({ where: { id: reviewId } });
-	if (!review)
-		throw new AppError(httpStatus.NOT_FOUND, "Review not found");
+	if (!review) throw new AppError(httpStatus.NOT_FOUND, "Review not found");
 
 	if (review.customerId !== customer.id)
-		throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to update this review");
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"You are not allowed to update this review",
+		);
 
 	return prisma.reviews.update({
 		where: { id: reviewId },
@@ -86,13 +104,17 @@ const updateReview = async (
 
 const deleteReview = async (reviewId: string, user: RequestUser) => {
 	const review = await prisma.reviews.findUnique({ where: { id: reviewId } });
-	if (!review)
-		throw new AppError(httpStatus.NOT_FOUND, "Review not found");
+	if (!review) throw new AppError(httpStatus.NOT_FOUND, "Review not found");
 
 	if (user.role === "CUSTOMER") {
-		const customer = await prisma.customers.findUnique({ where: { userId: user.userId } });
+		const customer = await prisma.customers.findUnique({
+			where: { userId: user.userId },
+		});
 		if (!customer || review.customerId !== customer.id)
-			throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to delete this review");
+			throw new AppError(
+				httpStatus.FORBIDDEN,
+				"You are not allowed to delete this review",
+			);
 	}
 
 	await prisma.reviews.delete({ where: { id: reviewId } });
@@ -100,7 +122,9 @@ const deleteReview = async (reviewId: string, user: RequestUser) => {
 };
 
 const getMyReviews = async (query: IQuery, user: RequestUser) => {
-	const customer = await prisma.customers.findUnique({ where: { userId: user.userId } });
+	const customer = await prisma.customers.findUnique({
+		where: { userId: user.userId },
+	});
 	if (!customer)
 		throw new AppError(httpStatus.NOT_FOUND, "Customer profile not found");
 
@@ -114,7 +138,13 @@ const getMyReviews = async (query: IQuery, user: RequestUser) => {
 			skip: (page - 1) * limit,
 			orderBy: { createdAt: "desc" },
 			include: {
-				shipment: { select: { trackingNumber: true, receiverName: true, receiverDistrict: true } },
+				shipment: {
+					select: {
+						trackingNumber: true,
+						receiverName: true,
+						receiverDistrict: true,
+					},
+				},
 				merchant: { select: { name: true } },
 				rider: { select: { name: true } },
 			},
@@ -122,11 +152,16 @@ const getMyReviews = async (query: IQuery, user: RequestUser) => {
 		prisma.reviews.count({ where: { customerId: customer.id } }),
 	]);
 
-	return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+	return {
+		data,
+		meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+	};
 };
 
 const getMerchantReviews = async (query: IQuery, user: RequestUser) => {
-	const merchant = await prisma.merchants.findUnique({ where: { userId: user.userId } });
+	const merchant = await prisma.merchants.findUnique({
+		where: { userId: user.userId },
+	});
 	if (!merchant)
 		throw new AppError(httpStatus.NOT_FOUND, "Merchant profile not found");
 
@@ -148,11 +183,16 @@ const getMerchantReviews = async (query: IQuery, user: RequestUser) => {
 		prisma.reviews.count({ where: { merchantId: merchant.id } }),
 	]);
 
-	return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+	return {
+		data,
+		meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+	};
 };
 
 const getRiderReviews = async (query: IQuery, user: RequestUser) => {
-	const rider = await prisma.riders.findUnique({ where: { userId: user.userId } });
+	const rider = await prisma.riders.findUnique({
+		where: { userId: user.userId },
+	});
 	if (!rider)
 		throw new AppError(httpStatus.NOT_FOUND, "Rider profile not found");
 
@@ -174,7 +214,10 @@ const getRiderReviews = async (query: IQuery, user: RequestUser) => {
 		prisma.reviews.count({ where: { riderId: rider.id } }),
 	]);
 
-	return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+	return {
+		data,
+		meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+	};
 };
 
 const getAllReviews = async (query: IQuery) => {
@@ -183,7 +226,9 @@ const getAllReviews = async (query: IQuery) => {
 
 	const where: Record<string, unknown> = {};
 	if (query.searchTerm)
-		where.shipment = { trackingNumber: { contains: query.searchTerm, mode: "insensitive" } };
+		where.shipment = {
+			trackingNumber: { contains: query.searchTerm, mode: "insensitive" },
+		};
 
 	const [data, total] = await Promise.all([
 		prisma.reviews.findMany({
@@ -201,7 +246,10 @@ const getAllReviews = async (query: IQuery) => {
 		prisma.reviews.count({ where }),
 	]);
 
-	return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+	return {
+		data,
+		meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+	};
 };
 
 export const ReviewServices = {

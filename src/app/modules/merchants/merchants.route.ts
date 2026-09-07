@@ -9,44 +9,44 @@ import { MerchantValidations } from "./merchants.validation";
 const router = Router();
 
 router.post(
-  "/apply-as-merchant",
-  upload.fields([
-    { name: "businessLicenseDocument", maxCount: 1 },
-    { name: "additionalDocuments", maxCount: 5 },
-  ]),
-  MerchantControllers.applyAsMerchant,
+	"/apply-as-merchant",
+	upload.fields([
+		{ name: "businessLicenseDocument", maxCount: 1 },
+		{ name: "additionalDocuments", maxCount: 5 },
+	]),
+	MerchantControllers.applyAsMerchant,
 );
 
 router.post(
-  "/verify-email",
-  validateRequest(MerchantValidations.MerchantEmailVerificationZodSchema),
-  MerchantControllers.verifyMerchantEmail,
+	"/verify-email",
+	validateRequest(MerchantValidations.MerchantEmailVerificationZodSchema),
+	MerchantControllers.verifyMerchantEmail,
 );
 
 router.patch(
-  "/approve",
-  auth(Role.ADMIN, Role.SUPER_ADMIN),
-  validateRequest(MerchantValidations.MerchantApplicationApprovalZodSchema),
-  MerchantControllers.approveMerchantApplication,
+	"/approve",
+	auth(Role.ADMIN, Role.SUPER_ADMIN),
+	validateRequest(MerchantValidations.MerchantApplicationApprovalZodSchema),
+	MerchantControllers.approveMerchantApplication,
 );
 
 router.get(
-  "/my-profile",
-  auth(Role.MERCHANT),
-  MerchantControllers.getMyProfile,
+	"/my-profile",
+	auth(Role.MERCHANT),
+	MerchantControllers.getMyProfile,
 );
 
 router.patch(
-  "/my-profile",
-  auth(Role.MERCHANT),
-  validateRequest(MerchantValidations.UpdateMerchantProfileZodSchema),
-  MerchantControllers.updateMyProfile,
+	"/my-profile",
+	auth(Role.MERCHANT),
+	validateRequest(MerchantValidations.UpdateMerchantProfileZodSchema),
+	MerchantControllers.updateMyProfile,
 );
 
 router.get(
-  "/",
-  auth(Role.ADMIN, Role.SUPER_ADMIN),
-  MerchantControllers.getAllMerchants,
+	"/",
+	auth(Role.ADMIN, Role.SUPER_ADMIN),
+	MerchantControllers.getAllMerchants,
 );
 
 export const MerchantRoutes = router;

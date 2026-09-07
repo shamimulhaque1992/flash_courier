@@ -29,16 +29,9 @@ router.post(
 	ShipmentControllers.createShipment,
 );
 
-router.post(
-	"/re-pay",
-	auth(Role.MERCHANT),
-	ShipmentControllers.payForShipment,
-);
+router.post("/re-pay", auth(Role.MERCHANT), ShipmentControllers.payForShipment);
 
-router.get(
-	"/payment/callback",
-	ShipmentControllers.shipmentPaymentCallback,
-);
+router.get("/payment/callback", ShipmentControllers.shipmentPaymentCallback);
 
 // Admin assigns a shipment to a rider's schedule
 router.post(

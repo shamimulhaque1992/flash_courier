@@ -40,7 +40,9 @@ export const deleteUnverifiedMerchants = () => {
 			});
 
 			if (deleted.count > 0)
-				console.log(`Cron [merchants]: Deleted ${deleted.count} unverified/rejected merchant(s)`);
+				console.log(
+					`Cron [merchants]: Deleted ${deleted.count} unverified/rejected merchant(s)`,
+				);
 		} catch (error) {
 			console.error("Cron [merchants] error:", error);
 		}
@@ -74,7 +76,9 @@ export const deleteUnverifiedRiders = () => {
 			});
 
 			if (deleted.count > 0)
-				console.log(`Cron [riders]: Deleted ${deleted.count} unverified/rejected rider(s)`);
+				console.log(
+					`Cron [riders]: Deleted ${deleted.count} unverified/rejected rider(s)`,
+				);
 		} catch (error) {
 			console.error("Cron [riders] error:", error);
 		}
@@ -110,7 +114,9 @@ export const deleteStalePendingShipments = () => {
 			});
 
 			if (deleted.count > 0)
-				console.log(`Cron [shipments]: Soft-deleted ${deleted.count} stale shipment(s)`);
+				console.log(
+					`Cron [shipments]: Soft-deleted ${deleted.count} stale shipment(s)`,
+				);
 		} catch (error) {
 			console.error("Cron [shipments] error:", error);
 		}

@@ -37,7 +37,9 @@ const getMySchedules = catchAsync(
 
 const getAllSchedules = catchAsync(
 	async (req: Request, res: Response, _next: NextFunction) => {
-		const { data, meta } = await RiderScheduleServices.getAllSchedules(req.query);
+		const { data, meta } = await RiderScheduleServices.getAllSchedules(
+			req.query,
+		);
 		sendResponse(res, {
 			statusCode: httpStatus.OK,
 			success: true,
@@ -50,7 +52,9 @@ const getAllSchedules = catchAsync(
 
 const getTodaysSchedules = catchAsync(
 	async (req: Request, res: Response, _next: NextFunction) => {
-		const { data, meta } = await RiderScheduleServices.getTodaysSchedules(req.query);
+		const { data, meta } = await RiderScheduleServices.getTodaysSchedules(
+			req.query,
+		);
 		sendResponse(res, {
 			statusCode: httpStatus.OK,
 			success: true,

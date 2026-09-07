@@ -134,7 +134,11 @@ const createSchedule = async (
 	validateTimeRange(payload.startTime, payload.endTime);
 
 	const existing = await prisma.riderSchedules.findFirst({
-		where: { riderId: rider.id, dayOfWeek: payload.dayOfWeek, isDeleted: false },
+		where: {
+			riderId: rider.id,
+			dayOfWeek: payload.dayOfWeek,
+			isDeleted: false,
+		},
 	});
 	if (existing)
 		throw new AppError(
@@ -179,12 +183,17 @@ const getMySchedules = async (query: IQuery, user: RequestUser) => {
 			orderBy: { [sortBy]: sortOrder },
 			take: limit,
 			skip,
-			include: { rider: { select: { name: true, email: true, division: true } } },
+			include: {
+				rider: { select: { name: true, email: true, division: true } },
+			},
 		}),
 		prisma.riderSchedules.count({ where: { AND: andConditions } }),
 	]);
 
-	return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+	return {
+		data,
+		meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+	};
 };
 
 const getAllSchedules = async (query: IQuery) => {
@@ -205,7 +214,6 @@ const getAllSchedules = async (query: IQuery) => {
 				OR: [
 					{ name: { contains: query.searchTerm, mode: "insensitive" } },
 					{ email: { contains: query.searchTerm, mode: "insensitive" } },
-
 				],
 			},
 		});
@@ -231,7 +239,10 @@ const getAllSchedules = async (query: IQuery) => {
 		prisma.riderSchedules.count({ where: { AND: andConditions } }),
 	]);
 
-	return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+	return {
+		data,
+		meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+	};
 };
 
 const getTodaysSchedules = async (query: IQuery) => {
@@ -269,7 +280,10 @@ const getTodaysSchedules = async (query: IQuery) => {
 		prisma.riderSchedules.count({ where: { AND: andConditions } }),
 	]);
 
-	return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+	return {
+		data,
+		meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+	};
 };
 
 const getScheduleById = async (scheduleId: string) => {
@@ -318,10 +332,16 @@ const updateSchedule = async (
 		);
 
 	if (schedule.status === RiderScheduleStatus.COMPLETED)
-		throw new AppError(httpStatus.METHOD_NOT_ALLOWED, "Cannot edit a completed schedule");
+		throw new AppError(
+			httpStatus.METHOD_NOT_ALLOWED,
+			"Cannot edit a completed schedule",
+		);
 
 	if (schedule.status === RiderScheduleStatus.CANCELLED)
-		throw new AppError(httpStatus.METHOD_NOT_ALLOWED, "Cannot edit a cancelled schedule");
+		throw new AppError(
+			httpStatus.METHOD_NOT_ALLOWED,
+			"Cannot edit a cancelled schedule",
+		);
 
 	const startTime = payload.startTime ?? schedule.startTime;
 	const endTime = payload.endTime ?? schedule.endTime;
@@ -351,10 +371,16 @@ const publishSchedule = async (scheduleId: string, user: RequestUser) => {
 		throw new AppError(httpStatus.BAD_REQUEST, "Schedule is already published");
 
 	if (schedule.status === RiderScheduleStatus.COMPLETED)
-		throw new AppError(httpStatus.BAD_REQUEST, "Cannot publish a completed schedule");
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"Cannot publish a completed schedule",
+		);
 
 	if (schedule.status === RiderScheduleStatus.CANCELLED)
-		throw new AppError(httpStatus.BAD_REQUEST, "Cannot publish a cancelled schedule");
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"Cannot publish a cancelled schedule",
+		);
 
 	return prisma.riderSchedules.update({
 		where: { id: scheduleId },
@@ -366,11 +392,16 @@ const getScheduleSlots = async (scheduleId: string, user: RequestUser) => {
 	const schedule = await prisma.riderSchedules.findUnique({
 		where: { id: scheduleId },
 		include: {
-			rider: { select: { name: true, email: true, contactNumber: true, userId: true } },
+			rider: {
+				select: { name: true, email: true, contactNumber: true, userId: true },
+			},
 			shipments: {
 				where: {
 					shipmentStatus: {
-						notIn: [ShipmentStatus.CANCELLED_BY_MERCHANT, ShipmentStatus.REJECTED_BY_RIDER],
+						notIn: [
+							ShipmentStatus.CANCELLED_BY_MERCHANT,
+							ShipmentStatus.REJECTED_BY_RIDER,
+						],
 					},
 				},
 				orderBy: { probableDeliveryTime: "asc" },
@@ -392,7 +423,10 @@ const getScheduleSlots = async (scheduleId: string, user: RequestUser) => {
 
 	// Only admin or the owner rider can view slots
 	if (user.role === "RIDER" && schedule.rider.userId !== user.userId)
-		throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to view this schedule's slots");
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"You are not allowed to view this schedule's slots",
+		);
 
 	const assignmentDate = getNextOccurrenceOfDay(schedule.dayOfWeek);
 
@@ -434,7 +468,10 @@ const deleteSchedule = async (scheduleId: string, user: RequestUser) => {
 		throw new AppError(httpStatus.NOT_FOUND, "Schedule not found");
 
 	if (schedule.status === RiderScheduleStatus.COMPLETED)
-		throw new AppError(httpStatus.BAD_REQUEST, "Cannot delete a completed schedule");
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"Cannot delete a completed schedule",
+		);
 
 	if (
 		schedule.status === RiderScheduleStatus.PUBLISHED &&

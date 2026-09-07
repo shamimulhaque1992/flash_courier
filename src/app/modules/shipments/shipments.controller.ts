@@ -18,7 +18,10 @@ const calculateDeliveryPrice = catchAsync(
 
 const trackShipment = catchAsync(
 	async (req: Request, res: Response, _next: NextFunction) => {
-		const result = await ShipmentServices.trackShipment(req.body.trackingNumber, req.user!);
+		const result = await ShipmentServices.trackShipment(
+			req.body.trackingNumber,
+			req.user!,
+		);
 		sendResponse(res, {
 			success: true,
 			statusCode: httpStatus.OK,
@@ -139,7 +142,10 @@ const updateShipmentStatus = catchAsync(
 
 const getMerchantShipments = catchAsync(
 	async (req: Request, res: Response, _next: NextFunction) => {
-		const { data, meta } = await ShipmentServices.getMerchantShipments(req.query, req.user!);
+		const { data, meta } = await ShipmentServices.getMerchantShipments(
+			req.query,
+			req.user!,
+		);
 		sendResponse(res, {
 			success: true,
 			statusCode: httpStatus.OK,
@@ -152,7 +158,10 @@ const getMerchantShipments = catchAsync(
 
 const getCustomerShipments = catchAsync(
 	async (req: Request, res: Response, _next: NextFunction) => {
-		const { data, meta } = await ShipmentServices.getCustomerShipments(req.query, req.user!);
+		const { data, meta } = await ShipmentServices.getCustomerShipments(
+			req.query,
+			req.user!,
+		);
 		sendResponse(res, {
 			success: true,
 			statusCode: httpStatus.OK,
@@ -165,7 +174,10 @@ const getCustomerShipments = catchAsync(
 
 const getRiderShipments = catchAsync(
 	async (req: Request, res: Response, _next: NextFunction) => {
-		const { data, meta } = await ShipmentServices.getRiderShipments(req.query, req.user!);
+		const { data, meta } = await ShipmentServices.getRiderShipments(
+			req.query,
+			req.user!,
+		);
 		sendResponse(res, {
 			success: true,
 			statusCode: httpStatus.OK,

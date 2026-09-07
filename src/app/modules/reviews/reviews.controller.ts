@@ -15,7 +15,11 @@ const createReview = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateReview = catchAsync(async (req: Request, res: Response) => {
-	const result = await ReviewServices.updateReview(req.params.reviewId, req.body, req.user!);
+	const result = await ReviewServices.updateReview(
+		req.params.reviewId,
+		req.body,
+		req.user!,
+	);
 	sendResponse(res, {
 		success: true,
 		statusCode: httpStatus.OK,
@@ -25,7 +29,10 @@ const updateReview = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteReview = catchAsync(async (req: Request, res: Response) => {
-	const result = await ReviewServices.deleteReview(req.params.reviewId, req.user!);
+	const result = await ReviewServices.deleteReview(
+		req.params.reviewId,
+		req.user!,
+	);
 	sendResponse(res, {
 		success: true,
 		statusCode: httpStatus.OK,
@@ -35,7 +42,10 @@ const deleteReview = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMyReviews = catchAsync(async (req: Request, res: Response) => {
-	const { data, meta } = await ReviewServices.getMyReviews(req.query, req.user!);
+	const { data, meta } = await ReviewServices.getMyReviews(
+		req.query,
+		req.user!,
+	);
 	sendResponse(res, {
 		success: true,
 		statusCode: httpStatus.OK,
@@ -46,7 +56,10 @@ const getMyReviews = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMerchantReviews = catchAsync(async (req: Request, res: Response) => {
-	const { data, meta } = await ReviewServices.getMerchantReviews(req.query, req.user!);
+	const { data, meta } = await ReviewServices.getMerchantReviews(
+		req.query,
+		req.user!,
+	);
 	sendResponse(res, {
 		success: true,
 		statusCode: httpStatus.OK,
@@ -57,7 +70,10 @@ const getMerchantReviews = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getRiderReviews = catchAsync(async (req: Request, res: Response) => {
-	const { data, meta } = await ReviewServices.getRiderReviews(req.query, req.user!);
+	const { data, meta } = await ReviewServices.getRiderReviews(
+		req.query,
+		req.user!,
+	);
 	sendResponse(res, {
 		success: true,
 		statusCode: httpStatus.OK,

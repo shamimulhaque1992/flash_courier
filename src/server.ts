@@ -1,9 +1,9 @@
 import app from "./app";
 import config from "./app/config";
 import {
+	deleteStalePendingShipments,
 	deleteUnverifiedMerchants,
 	deleteUnverifiedRiders,
-	deleteStalePendingShipments,
 } from "./app/lib/cron";
 import { prisma } from "./app/lib/prisma";
 import { redisClient } from "./app/lib/redis";

@@ -1,5 +1,4 @@
-import { Division } from "../../../generated/prisma/enums";
-
+import type { Division } from "../../../generated/prisma/enums";
 
 export interface IUpdateShipmentStatusPayload {
 	status: string;

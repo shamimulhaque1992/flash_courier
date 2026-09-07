@@ -8,7 +8,8 @@ const getMyProfile = async (user: RequestUser) => {
 		where: { userId: user.userId },
 		include: { user: { omit: { password: true } } },
 	});
-	if (!customer) throw new AppError(httpStatus.NOT_FOUND, "Customer profile not found");
+	if (!customer)
+		throw new AppError(httpStatus.NOT_FOUND, "Customer profile not found");
 	return customer;
 };
 
@@ -22,8 +23,11 @@ const updateMyProfile = async (
 	},
 	user: RequestUser,
 ) => {
-	const customer = await prisma.customers.findUnique({ where: { userId: user.userId } });
-	if (!customer) throw new AppError(httpStatus.NOT_FOUND, "Customer profile not found");
+	const customer = await prisma.customers.findUnique({
+		where: { userId: user.userId },
+	});
+	if (!customer)
+		throw new AppError(httpStatus.NOT_FOUND, "Customer profile not found");
 
 	const { name, ...customerFields } = payload;
 

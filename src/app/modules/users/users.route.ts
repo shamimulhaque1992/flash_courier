@@ -7,10 +7,10 @@ import { userController } from "./users.controller";
 const router = Router();
 
 router.patch(
-  "/profile-image",
-  auth(Role.SUPER_ADMIN, Role.ADMIN, Role.MERCHANT, Role.RIDER, Role.CUSTOMER),
-  upload.single("profileImage"),
-  userController.uploadImage,
+	"/profile-image",
+	auth(Role.SUPER_ADMIN, Role.ADMIN, Role.MERCHANT, Role.RIDER, Role.CUSTOMER),
+	upload.single("profileImage"),
+	userController.uploadImage,
 );
 
 export const UserRoutes = router;

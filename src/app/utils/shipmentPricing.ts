@@ -41,78 +41,80 @@ const FRAGILE_SURCHARGE = 30;
 
 // Full symmetric inter-division base rate matrix
 // Rates based on geographic proximity across Bangladesh's 8 divisions
-const INTER_DIVISION_BASE: Partial<Record<Division, Partial<Record<Division, number>>>> = {
+const INTER_DIVISION_BASE: Partial<
+	Record<Division, Partial<Record<Division, number>>>
+> = {
 	[Division.DHAKA]: {
 		[Division.CHATTOGRAM]: 130,
-		[Division.RAJSHAHI]:   120,
-		[Division.KHULNA]:     120,
-		[Division.BARISHAL]:   110,
-		[Division.SYLHET]:     130,
-		[Division.RANGPUR]:    150,
+		[Division.RAJSHAHI]: 120,
+		[Division.KHULNA]: 120,
+		[Division.BARISHAL]: 110,
+		[Division.SYLHET]: 130,
+		[Division.RANGPUR]: 150,
 		[Division.MYMENSINGH]: 110,
 	},
 	[Division.CHATTOGRAM]: {
-		[Division.DHAKA]:      130,
-		[Division.RAJSHAHI]:   150,
-		[Division.KHULNA]:     150,
-		[Division.BARISHAL]:   130,
-		[Division.SYLHET]:     130,
-		[Division.RANGPUR]:    150,
+		[Division.DHAKA]: 130,
+		[Division.RAJSHAHI]: 150,
+		[Division.KHULNA]: 150,
+		[Division.BARISHAL]: 130,
+		[Division.SYLHET]: 130,
+		[Division.RANGPUR]: 150,
 		[Division.MYMENSINGH]: 140,
 	},
 	[Division.RAJSHAHI]: {
-		[Division.DHAKA]:      120,
+		[Division.DHAKA]: 120,
 		[Division.CHATTOGRAM]: 150,
-		[Division.KHULNA]:     120,
-		[Division.BARISHAL]:   140,
-		[Division.SYLHET]:     150,
-		[Division.RANGPUR]:    110,
+		[Division.KHULNA]: 120,
+		[Division.BARISHAL]: 140,
+		[Division.SYLHET]: 150,
+		[Division.RANGPUR]: 110,
 		[Division.MYMENSINGH]: 130,
 	},
 	[Division.KHULNA]: {
-		[Division.DHAKA]:      120,
+		[Division.DHAKA]: 120,
 		[Division.CHATTOGRAM]: 150,
-		[Division.RAJSHAHI]:   120,
-		[Division.BARISHAL]:   110,
-		[Division.SYLHET]:     150,
-		[Division.RANGPUR]:    150,
+		[Division.RAJSHAHI]: 120,
+		[Division.BARISHAL]: 110,
+		[Division.SYLHET]: 150,
+		[Division.RANGPUR]: 150,
 		[Division.MYMENSINGH]: 140,
 	},
 	[Division.BARISHAL]: {
-		[Division.DHAKA]:      110,
+		[Division.DHAKA]: 110,
 		[Division.CHATTOGRAM]: 130,
-		[Division.RAJSHAHI]:   140,
-		[Division.KHULNA]:     110,
-		[Division.SYLHET]:     140,
-		[Division.RANGPUR]:    150,
+		[Division.RAJSHAHI]: 140,
+		[Division.KHULNA]: 110,
+		[Division.SYLHET]: 140,
+		[Division.RANGPUR]: 150,
 		[Division.MYMENSINGH]: 130,
 	},
 	[Division.SYLHET]: {
-		[Division.DHAKA]:      130,
+		[Division.DHAKA]: 130,
 		[Division.CHATTOGRAM]: 130,
-		[Division.RAJSHAHI]:   150,
-		[Division.KHULNA]:     150,
-		[Division.BARISHAL]:   140,
-		[Division.RANGPUR]:    150,
+		[Division.RAJSHAHI]: 150,
+		[Division.KHULNA]: 150,
+		[Division.BARISHAL]: 140,
+		[Division.RANGPUR]: 150,
 		[Division.MYMENSINGH]: 120,
 	},
 	[Division.RANGPUR]: {
-		[Division.DHAKA]:      150,
+		[Division.DHAKA]: 150,
 		[Division.CHATTOGRAM]: 150,
-		[Division.RAJSHAHI]:   110,
-		[Division.KHULNA]:     150,
-		[Division.BARISHAL]:   150,
-		[Division.SYLHET]:     150,
+		[Division.RAJSHAHI]: 110,
+		[Division.KHULNA]: 150,
+		[Division.BARISHAL]: 150,
+		[Division.SYLHET]: 150,
 		[Division.MYMENSINGH]: 130,
 	},
 	[Division.MYMENSINGH]: {
-		[Division.DHAKA]:      110,
+		[Division.DHAKA]: 110,
 		[Division.CHATTOGRAM]: 140,
-		[Division.RAJSHAHI]:   130,
-		[Division.KHULNA]:     140,
-		[Division.BARISHAL]:   130,
-		[Division.SYLHET]:     120,
-		[Division.RANGPUR]:    130,
+		[Division.RAJSHAHI]: 130,
+		[Division.KHULNA]: 140,
+		[Division.BARISHAL]: 130,
+		[Division.SYLHET]: 120,
+		[Division.RANGPUR]: 130,
 	},
 };
 
@@ -144,7 +146,12 @@ export interface IShipmentPricingResult {
 export const calculateShipmentFee = (
 	input: IShipmentPricingInput,
 ): IShipmentPricingResult => {
-	const { senderDivision, receiverDivision, weightKg, isFragile = false } = input;
+	const {
+		senderDivision,
+		receiverDivision,
+		weightKg,
+		isFragile = false,
+	} = input;
 
 	const bracket = getWeightBracket(weightKg);
 	const isIntraDivision = senderDivision === receiverDivision;

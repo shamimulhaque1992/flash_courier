@@ -31,6 +31,19 @@ router.patch(
 );
 
 router.get(
+  "/my-profile",
+  auth(Role.MERCHANT),
+  MerchantControllers.getMyProfile,
+);
+
+router.patch(
+  "/my-profile",
+  auth(Role.MERCHANT),
+  validateRequest(MerchantValidations.UpdateMerchantProfileZodSchema),
+  MerchantControllers.updateMyProfile,
+);
+
+router.get(
   "/",
   auth(Role.ADMIN, Role.SUPER_ADMIN),
   MerchantControllers.getAllMerchants,

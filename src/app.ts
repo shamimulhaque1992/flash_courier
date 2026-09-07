@@ -12,6 +12,7 @@ import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
 import { AnalyticsRoutes } from "./app/modules/analytics/analytics.route";
 import { ReviewRoutes } from "./app/modules/reviews/reviews.route";
+import { CustomerRoutes } from "./app/modules/customers/customers.route";
 import { AuditRoutes } from "./app/modules/audits/audits.route";
 import { PaymentRoutes } from "./app/modules/payments/payments.route";
 import { AuthRoutes } from "./app/modules/auth/auth.route";
@@ -48,6 +49,7 @@ app.use("/api/v1/rider-schedules", RiderScheduleRoutes);
 app.use("/api/v1/payments", PaymentRoutes);
 app.use("/api/v1/analytics", AnalyticsRoutes);
 app.use("/api/v1/reviews", ReviewRoutes);
+app.use("/api/v1/customers", CustomerRoutes);
 app.use("/api/v1/audits", AuditRoutes);
 
 // Basic route

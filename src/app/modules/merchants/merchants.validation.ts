@@ -68,8 +68,21 @@ export const MerchantApplicationApprovalZodSchema = z.object({
     .optional(),
 });
 
+export const UpdateMerchantProfileZodSchema = z.object({
+  body: z.object({
+    name: z.string().min(2).max(100).optional(),
+    contactNumber: z.string().min(10).max(15).optional(),
+    thana: z.string().min(2).max(100).optional(),
+    district: z.string().min(2).max(100).optional(),
+    division: z.nativeEnum(Division).optional(),
+    address: z.string().min(2).max(255).optional(),
+    businessDescription: z.string().min(2).max(255).optional(),
+  }),
+});
+
 export const MerchantValidations = {
   MerchantRegistrationZodSchema,
   MerchantEmailVerificationZodSchema,
   MerchantApplicationApprovalZodSchema,
+  UpdateMerchantProfileZodSchema,
 };

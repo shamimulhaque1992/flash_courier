@@ -12,6 +12,7 @@ import { AppError } from "../../utils/AppError";
 import { cloudinary } from "../../lib/cloudinary";
 import config from "../../config";
 import {
+  Division,
   RiderVerificationStatus,
   Role,
   UserStatus,
@@ -260,7 +261,7 @@ const getAllRiders = async (query: IQuery) => {
         { vehicleType: { contains: query.searchTerm, mode: "insensitive" } },
         { thana: { contains: query.searchTerm, mode: "insensitive" } },
         { district: { contains: query.searchTerm, mode: "insensitive" } },
-        { division: { contains: query.searchTerm, mode: "insensitive" } },
+
       ],
     });
   }
@@ -280,7 +281,7 @@ const getAllRiders = async (query: IQuery) => {
 
   if (query.division)
     andConditions.push({
-      division: { equals: query.division, mode: "insensitive" },
+      division: query.division as Division,
     });
 
   if (query.verificationStatus)
@@ -315,9 +316,52 @@ const getAllRiders = async (query: IQuery) => {
   };
 };
 
+const getMyProfile = async (user: RequestUser) => {
+	const rider = await prisma.riders.findUnique({
+		where: { userId: user.userId, isDeleted: false },
+		include: { user: { omit: { password: true } } },
+	});
+	if (!rider) throw new AppError(httpStatus.NOT_FOUND, "Rider profile not found");
+	return rider;
+};
+
+const updateMyProfile = async (
+	payload: {
+		name?: string;
+		contactNumber?: string;
+		thana?: string;
+		district?: string;
+		address?: string;
+		vehicleType?: string;
+		vehicleRegistrationNumber?: string;
+		licenseNumber?: string;
+	},
+	user: RequestUser,
+) => {
+	const rider = await prisma.riders.findUnique({
+		where: { userId: user.userId, isDeleted: false },
+	});
+	if (!rider) throw new AppError(httpStatus.NOT_FOUND, "Rider profile not found");
+
+	const { name, ...riderFields } = payload;
+
+	const updated = await prisma.riders.update({
+		where: { userId: user.userId },
+		data: {
+			...riderFields,
+			...(name ? { name } : {}),
+			...(name ? { user: { update: { name } } } : {}),
+		},
+		include: { user: { omit: { password: true } } },
+	});
+	return updated;
+};
+
 export const RiderServices = {
   applyAsRider,
   verifyRiderEmail,
   approveRiderApplication,
   getAllRiders,
+  getMyProfile,
+  updateMyProfile,
 };

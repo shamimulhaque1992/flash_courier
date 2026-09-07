@@ -13,6 +13,7 @@ import { cloudinary } from "../../lib/cloudinary";
 import config from "../../config";
 import {
   MerchantVerificationStatus,
+  Division,
   Role,
   UserStatus,
 } from "../../../generated/prisma/enums";
@@ -292,7 +293,7 @@ const getAllMerchants = async (query: IQuery) => {
         { businessType: { contains: query.searchTerm, mode: "insensitive" } },
         { thana: { contains: query.searchTerm, mode: "insensitive" } },
         { district: { contains: query.searchTerm, mode: "insensitive" } },
-        { division: { contains: query.searchTerm, mode: "insensitive" } },
+
       ],
     });
   }
@@ -330,7 +331,7 @@ const getAllMerchants = async (query: IQuery) => {
   }
   if (query.division) {
     andConditions.push({
-      division: { equals: query.division, mode: "insensitive" },
+      division: query.division as Division,
     });
   }
 
@@ -375,9 +376,50 @@ const getAllMerchants = async (query: IQuery) => {
   };
 };
 
+const getMyProfile = async (user: RequestUser) => {
+	const merchant = await prisma.merchants.findUnique({
+		where: { userId: user.userId, isDeleted: false },
+		include: { user: { omit: { password: true } } },
+	});
+	if (!merchant) throw new AppError(httpStatus.NOT_FOUND, "Merchant profile not found");
+	return merchant;
+};
+
+const updateMyProfile = async (
+	payload: {
+		name?: string;
+		contactNumber?: string;
+		thana?: string;
+		district?: string;
+		address?: string;
+		businessDescription?: string;
+	},
+	user: RequestUser,
+) => {
+	const merchant = await prisma.merchants.findUnique({
+		where: { userId: user.userId, isDeleted: false },
+	});
+	if (!merchant) throw new AppError(httpStatus.NOT_FOUND, "Merchant profile not found");
+
+	const { name, ...merchantFields } = payload;
+
+	const updated = await prisma.merchants.update({
+		where: { userId: user.userId },
+		data: {
+			...merchantFields,
+			...(name ? { name } : {}),
+			...(name ? { user: { update: { name } } } : {}),
+		},
+		include: { user: { omit: { password: true } } },
+	});
+	return updated;
+};
+
 export const MerchantServices = {
   applyAsMerchant,
   verifyMerchantEmail,
   approveMerchantApplication,
   getAllMerchants,
+  getMyProfile,
+  updateMyProfile,
 };

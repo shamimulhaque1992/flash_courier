@@ -63,9 +63,31 @@ const getAllRiders = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyProfile = catchAsync(async (req: Request, res: Response) => {
+  const result = await RiderServices.getMyProfile(req.user!);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Profile fetched successfully",
+    data: result,
+  });
+});
+
+const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
+  const result = await RiderServices.updateMyProfile(req.body, req.user!);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Profile updated successfully",
+    data: result,
+  });
+});
+
 export const RiderControllers = {
   applyAsRider,
   verifyRiderEmail,
   approveRiderApplication,
   getAllRiders,
+  getMyProfile,
+  updateMyProfile,
 };

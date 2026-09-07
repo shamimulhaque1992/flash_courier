@@ -31,6 +31,19 @@ router.patch(
 );
 
 router.get(
+  "/my-profile",
+  auth(Role.RIDER),
+  RiderControllers.getMyProfile,
+);
+
+router.patch(
+  "/my-profile",
+  auth(Role.RIDER),
+  validateRequest(RiderValidations.UpdateRiderProfileZodSchema),
+  RiderControllers.updateMyProfile,
+);
+
+router.get(
   "/",
   auth(Role.ADMIN, Role.SUPER_ADMIN),
   RiderControllers.getAllRiders,

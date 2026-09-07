@@ -27,6 +27,7 @@ model Merchants {
 
     shipments Shipments[]
     reviews   Reviews[]
+    audits    MerchantAudits[]
 
     @@map("merchants")
 }

@@ -1,0 +1,13 @@
+model MerchantAudits {
+    id          String   @id @default(uuid())
+    merchantId  String
+    merchant    Merchants @relation(fields: [merchantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    startDate   DateTime
+    endDate     DateTime
+    reportUrl   String
+    reportPublicId String
+    publishedBy String
+    createdAt   DateTime @default(now())
+
+    @@map("merchant_audits")
+}

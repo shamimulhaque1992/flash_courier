@@ -821,12 +821,9 @@ const cancelShipment = async (
   });
 };
 
-// Valid forward-only transitions
-const ALLOWED_TRANSITIONS: Partial<Record<ShipmentStatus, ShipmentStatus[]>> = {
-  [ShipmentStatus.PAID]: [
-    ShipmentStatus.READY_FOR_ASSIGNMENT,
-    ShipmentStatus.IN_TRANSIT,
-  ],
+// Base transitions valid for all shipments
+const SAME_DIVISION_TRANSITIONS: Partial<Record<ShipmentStatus, ShipmentStatus[]>> = {
+  [ShipmentStatus.PAID]: [ShipmentStatus.READY_FOR_ASSIGNMENT],
   [ShipmentStatus.READY_FOR_ASSIGNMENT]: [ShipmentStatus.IN_TRANSIT],
   [ShipmentStatus.IN_TRANSIT]: [
     ShipmentStatus.READY_FOR_ASSIGNMENT,
@@ -845,6 +842,16 @@ const ALLOWED_TRANSITIONS: Partial<Record<ShipmentStatus, ShipmentStatus[]>> = {
   ],
 };
 
+// Inter-division: PAID must go IN_TRANSIT first, then READY_FOR_ASSIGNMENT
+const INTER_DIVISION_TRANSITIONS: Partial<Record<ShipmentStatus, ShipmentStatus[]>> = {
+  ...SAME_DIVISION_TRANSITIONS,
+  [ShipmentStatus.PAID]: [ShipmentStatus.IN_TRANSIT],
+  [ShipmentStatus.IN_TRANSIT]: [
+    ShipmentStatus.READY_FOR_ASSIGNMENT,
+    ShipmentStatus.ASSIGNED,
+  ],
+};
+
 const updateShipmentStatus = async (
   shipmentId: string,
   payload: IUpdateShipmentStatusPayload,
@@ -852,6 +859,7 @@ const updateShipmentStatus = async (
 ) => {
   const shipment = await prisma.shipments.findUnique({
     where: { id: shipmentId },
+    include: { merchant: true },
   });
 
   if (!shipment || shipment.isDeleted)
@@ -861,22 +869,21 @@ const updateShipmentStatus = async (
   const newStatus = payload.status as ShipmentStatus;
 
   if (currentStatus === ShipmentStatus.DELIVERED)
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Cannot update a delivered shipment",
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, "Cannot update a delivered shipment");
 
   if (currentStatus === ShipmentStatus.CANCELLED_BY_MERCHANT)
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Cannot update a cancelled shipment",
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, "Cannot update a cancelled shipment");
 
-  const allowed = ALLOWED_TRANSITIONS[currentStatus];
+  const isInterDivision = shipment.merchant.division !== shipment.receiverDivision;
+  const transitions = isInterDivision ? INTER_DIVISION_TRANSITIONS : SAME_DIVISION_TRANSITIONS;
+  const allowed = transitions[currentStatus];
+
   if (!allowed || !allowed.includes(newStatus))
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      `Cannot transition from ${currentStatus} to ${newStatus}`,
+      isInterDivision && currentStatus === ShipmentStatus.PAID && newStatus === ShipmentStatus.READY_FOR_ASSIGNMENT
+        ? "Inter-division shipment must go through IN_TRANSIT before READY_FOR_ASSIGNMENT"
+        : `Cannot transition from ${currentStatus} to ${newStatus}`,
     );
 
   // If rejecting by rider, restore the schedule slot

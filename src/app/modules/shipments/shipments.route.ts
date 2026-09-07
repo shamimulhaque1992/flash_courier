@@ -32,6 +32,13 @@ router.post(
 	ShipmentControllers.assignShipment,
 );
 
+// Rider accepts or rejects an assigned shipment
+router.patch(
+	"/respond/:shipmentId",
+	auth(Role.RIDER),
+	ShipmentControllers.respondToShipment,
+);
+
 // Rider marks shipment as delivered using customer OTP
 router.patch(
 	"/deliver/:shipmentId",

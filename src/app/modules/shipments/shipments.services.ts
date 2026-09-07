@@ -504,6 +504,60 @@ const assignShipment = async (
   return updatedShipment;
 };
 
+const respondToShipment = async (
+  shipmentId: string,
+  status: "ACCEPTED_BY_RIDER" | "REJECTED_BY_RIDER",
+  riderUser: RequestUser,
+) => {
+  return prisma.$transaction(async (tx) => {
+    const rider = await tx.riders.findUnique({
+      where: { userId: riderUser.userId },
+    });
+    if (!rider || rider.isDeleted)
+      throw new AppError(httpStatus.NOT_FOUND, "Rider profile not found");
+
+    const shipment = await tx.shipments.findUnique({
+      where: { id: shipmentId, riderId: rider.id },
+    });
+
+    if (!shipment || shipment.isDeleted)
+      throw new AppError(httpStatus.NOT_FOUND, "Shipment not found");
+
+    if (shipment.shipmentStatus !== ShipmentStatus.ASSIGNED)
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Shipment must be in ASSIGNED status to accept or reject",
+      );
+
+    const [updatedShipment] = await Promise.all([
+      tx.shipments.update({
+        where: { id: shipmentId },
+        data: { shipmentStatus: status },
+      }),
+      tx.shipmentHistories.create({
+        data: {
+          shipmentId,
+          status,
+          updatedBy: riderUser.userId,
+          remarks:
+            status === ShipmentStatus.ACCEPTED_BY_RIDER
+              ? "Shipment accepted by rider"
+              : "Shipment rejected by rider",
+        },
+      }),
+    ]);
+
+    if (status === ShipmentStatus.REJECTED_BY_RIDER && shipment.scheduleId) {
+      await tx.riderSchedules.update({
+        where: { id: shipment.scheduleId },
+        data: { availableSlots: { increment: 1 } },
+      });
+    }
+
+    return updatedShipment;
+  });
+};
+
 const markShipmentDelivered = async (
   shipmentId: string,
   otp: string,
@@ -1069,6 +1123,7 @@ export const ShipmentServices = {
   shipmentPaymentCallback,
   payForShipment,
   assignShipment,
+  respondToShipment,
   markShipmentDelivered,
   cancelShipment,
   updateShipmentStatus,

@@ -53,6 +53,22 @@ const assignShipment = catchAsync(
 	},
 );
 
+const respondToShipment = catchAsync(
+	async (req: Request, res: Response, _next: NextFunction) => {
+		const result = await ShipmentServices.respondToShipment(
+			req.params.shipmentId as string,
+			req.body.status,
+			req.user!,
+		);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Shipment response recorded successfully",
+			data: result,
+		});
+	},
+);
+
 const markShipmentDelivered = catchAsync(
 	async (req: Request, res: Response, _next: NextFunction) => {
 		const result = await ShipmentServices.markShipmentDelivered(
@@ -169,6 +185,7 @@ export const ShipmentControllers = {
 	shipmentPaymentCallback,
 	payForShipment,
 	assignShipment,
+	respondToShipment,
 	markShipmentDelivered,
 	cancelShipment,
 	updateShipmentStatus,

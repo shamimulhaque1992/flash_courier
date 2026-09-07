@@ -1,4 +1,4 @@
-import { RiderVerificationStatus, Role } from "../../../generated/prisma/enums";
+import { Division, RiderVerificationStatus, Role } from "../../../generated/prisma/enums";
 
 export interface IApplyAsRiderPayload {
   user: {
@@ -12,7 +12,7 @@ export interface IApplyAsRiderPayload {
     nidNumber: string;
     thana: string;
     district: string;
-    division: string;
+    division: Division;
     address: string;
     licenseNumber?: string;
     vehicleType: string;

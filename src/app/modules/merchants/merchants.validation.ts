@@ -1,5 +1,5 @@
 import z from "zod";
-import { MerchantVerificationStatus } from "../../../generated/prisma/enums";
+import { Division, MerchantVerificationStatus } from "../../../generated/prisma/enums";
 
 const MerchantRegistrationZodSchema = z.object({
   user: z.object({
@@ -29,10 +29,7 @@ const MerchantRegistrationZodSchema = z.object({
       .string()
       .min(2, "District must be at least 2 characters long")
       .max(100, "District must be at most 100 characters long"),
-    division: z
-      .string()
-      .min(2, "Division must be at least 2 characters long")
-      .max(100, "Division must be at most 100 characters long"),
+    division: z.nativeEnum(Division),
     address: z
       .string()
       .min(2, "Address must be at least 2 characters long")

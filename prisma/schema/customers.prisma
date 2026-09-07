@@ -3,16 +3,16 @@ model Customers {
     name          String
     email         String    @unique
     contactNumber String?
-    thana        String?
-    district     String?
-    division     Division?
+    thana         String?
+    district      String?
+    division      Division
     address       String?
     isDeleted     Boolean   @default(false)
     deletedAt     DateTime?
     createdAt     DateTime  @default(now())
     updatedAt     DateTime  @updatedAt
     userId        String    @unique
-    user          Users      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    user          Users     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
     shipments Shipments[]
     reviews   Reviews[]

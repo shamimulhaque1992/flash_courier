@@ -1,87 +1,85 @@
 import z from "zod";
 import {
-	Division,
-	RiderVerificationStatus,
+  Division,
+  RiderVerificationStatus,
 } from "../../../generated/prisma/enums";
 
 const RiderRegistrationZodSchema = z.object({
-	user: z.object({
-		name: z
-			.string()
-			.min(2, "Name must be at least 2 characters long")
-			.max(100, "Name must be at most 100 characters long"),
-		email: z.email("Invalid email address"),
-		password: z
-			.string()
-			.min(6, "Password must be at least 6 characters long")
-			.max(100, "Password must be at most 100 characters long"),
-		role: z.enum(["RIDER"], {
-			error: "Invalid role. Only 'RIDER' is allowed.",
-		}),
-	}),
-	rider: z.object({
-		contactNumber: z
-			.string()
-			.min(10, "Contact number must be at least 10 characters long")
-			.max(15, "Contact number must be at most 15 characters long"),
-		nidNumber: z
-			.string()
-			.min(10, "NID number must be at least 10 characters long")
-			.max(20, "NID number must be at most 20 characters long"),
-		thana: z
-			.string()
-			.min(2, "Thana must be at least 2 characters long")
-			.max(100, "Thana must be at most 100 characters long"),
-		district: z
-			.string()
-			.min(2, "District must be at least 2 characters long")
-			.max(100, "District must be at most 100 characters long"),
-		division: z.nativeEnum(Division),
-		address: z
-			.string()
-			.min(2, "Address must be at least 2 characters long")
-			.max(255, "Address must be at most 255 characters long"),
-		licenseNumber: z.string().optional(),
-		vehicleType: z
-			.string()
-			.min(2, "Vehicle type must be at least 2 characters long"),
-		vehicleRegistrationNumber: z.string().optional(),
-	}),
+  user: z.object({
+    name: z
+      .string()
+      .min(2, "Name must be at least 2 characters long")
+      .max(100, "Name must be at most 100 characters long"),
+    email: z.email("Invalid email address"),
+    password: z
+      .string()
+      .min(6, "Password must be at least 6 characters long")
+      .max(100, "Password must be at most 100 characters long"),
+    role: z.enum(["RIDER"], {
+      error: "Invalid role. Only 'RIDER' is allowed.",
+    }),
+  }),
+  rider: z.object({
+    contactNumber: z
+      .string()
+      .min(10, "Contact number must be at least 10 characters long")
+      .max(15, "Contact number must be at most 15 characters long"),
+    nidNumber: z
+      .string()
+      .min(10, "NID number must be at least 10 characters long")
+      .max(20, "NID number must be at most 20 characters long"),
+    thana: z
+      .string()
+      .min(2, "Thana must be at least 2 characters long")
+      .max(100, "Thana must be at most 100 characters long"),
+    district: z
+      .string()
+      .min(2, "District must be at least 2 characters long")
+      .max(100, "District must be at most 100 characters long"),
+    division: z.nativeEnum(Division),
+    address: z
+      .string()
+      .min(2, "Address must be at least 2 characters long")
+      .max(255, "Address must be at most 255 characters long"),
+    licenseNumber: z.string().optional(),
+    vehicleType: z
+      .string()
+      .min(2, "Vehicle type must be at least 2 characters long"),
+    vehicleRegistrationNumber: z.string().optional(),
+  }),
 });
 
 const RiderEmailVerificationZodSchema = z.object({
-	email: z.email("Invalid email address"),
-	otp: z.string().min(6, "OTP must be at least 6 characters long"),
+  email: z.email("Invalid email address"),
+  otp: z.string().min(6, "OTP must be at least 6 characters long"),
 });
 
 const RiderApplicationApprovalZodSchema = z.object({
-	riderId: z.string("Invalid rider ID"),
-	verificationStatus: z.enum(RiderVerificationStatus, {
-		error: "Invalid verification status",
-	}),
-	rejectionReason: z
-		.string()
-		.min(6, "Rejection reason must be at least 6 characters long")
-		.optional(),
+  riderId: z.string("Invalid rider ID"),
+  verificationStatus: z.enum(RiderVerificationStatus, {
+    error: "Invalid verification status",
+  }),
+  rejectionReason: z
+    .string()
+    .min(6, "Rejection reason must be at least 6 characters long")
+    .optional(),
 });
 
 const UpdateRiderProfileZodSchema = z.object({
-	body: z.object({
-		name: z.string().min(2).max(100).optional(),
-		contactNumber: z.string().min(10).max(15).optional(),
-		thana: z.string().min(2).max(100).optional(),
-		district: z.string().min(2).max(100).optional(),
-		division: z.nativeEnum(Division).optional(),
-		address: z.string().min(2).max(255).optional(),
-		vehicleType: z.string().min(2).optional(),
-		vehicleRegistrationNumber: z.string().optional(),
-		licenseNumber: z.string().optional(),
-	}),
+  name: z.string().min(2).max(100).optional(),
+  contactNumber: z.string().min(10).max(15).optional(),
+  thana: z.string().min(2).max(100).optional(),
+  district: z.string().min(2).max(100).optional(),
+  division: z.nativeEnum(Division).optional(),
+  address: z.string().min(2).max(255).optional(),
+  vehicleType: z.string().min(2).optional(),
+  vehicleRegistrationNumber: z.string().optional(),
+  licenseNumber: z.string().optional(),
 });
 
 export const RiderValidations = {
-	RiderRegistrationZodSchema,
-	RiderEmailVerificationZodSchema,
-	RiderApplicationApprovalZodSchema,
-	UpdateRiderProfileZodSchema,
+  RiderRegistrationZodSchema,
+  RiderEmailVerificationZodSchema,
+  RiderApplicationApprovalZodSchema,
+  UpdateRiderProfileZodSchema,
 };

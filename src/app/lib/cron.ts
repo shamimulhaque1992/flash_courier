@@ -66,7 +66,7 @@ export const deleteUnverifiedRiders = () => {
 						},
 						{
 							emailVerified: true,
-							rider: {
+							riders: {
 								verificationStatus: RiderVerificationStatus.REJECTED,
 								reviewedAt: { lt: TWO_DAYS_AGO() },
 							},

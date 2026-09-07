@@ -19,7 +19,6 @@ import { sendEmail } from "../../utils/sendEmail";
 import { calculateShipmentFee } from "../../utils/shipmentPricing";
 import {
   computeProbableDeliveryTime,
-  getScheduleEndTime,
   getNextOccurrenceOfDay,
 } from "../riders-schedules/riders-schedules.services";
 import {
@@ -453,16 +452,6 @@ const assignShipment = async (
         calculatedTime > now
           ? calculatedTime
           : addMinutes(now, SLOT_DURATION_MINUTES);
-      const scheduleEndTime = getScheduleEndTime(
-        schedule.endTime,
-        assignmentDate,
-      );
-
-      if (probableDeliveryTime > scheduleEndTime)
-        throw new AppError(
-          httpStatus.CONFLICT,
-          `Cannot assign shipment: the delivery would exceed the rider's schedule ending at ${schedule.endTime}`,
-        );
 
       const otp = generateOtp();
 

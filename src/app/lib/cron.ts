@@ -30,7 +30,7 @@ export const deleteUnverifiedMerchants = () => {
 						// Email verified but application rejected for 2 days
 						{
 							emailVerified: true,
-							merchant: {
+							merchants: {
 								verificationStatus: MerchantVerificationStatus.REJECTED,
 								reviewedAt: { lt: TWO_DAYS_AGO() },
 							},

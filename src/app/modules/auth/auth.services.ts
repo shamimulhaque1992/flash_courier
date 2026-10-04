@@ -5,6 +5,7 @@ import httpStatus from "http-status";
 import type { JwtPayload, SignOptions } from "jsonwebtoken";
 import {
 	AuthProvider,
+	Division,
 	Role,
 	UserStatus,
 } from "../../../generated/prisma/enums";
@@ -20,6 +21,7 @@ import type {
 	IGoogleLoginPayload,
 	ILoginUserPayload,
 	IRegisterCustomerPayload,
+	IRequestUser,
 	IResetPasswordPayload,
 	IVerifyEmailPayload,
 } from "./auth.interface";
@@ -253,6 +255,23 @@ const loginUser = async (payload: ILoginUserPayload) => {
 		accessToken,
 		refreshToken,
 	};
+};
+
+const getMe = async (user: IRequestUser) => {
+	const isUserExists = await prisma.users.findUnique({
+		where: {
+			id: user.userId,
+		},
+		omit: {
+			password: true,
+		},
+	});
+
+	if (!isUserExists) {
+		throw new AppError(httpStatus.NOT_FOUND, "User not found");
+	}
+
+	return isUserExists;
 };
 
 const refreshToken = async (token: string) => {
@@ -530,10 +549,11 @@ const googleLogin = async (payload: IGoogleLoginPayload) => {
 					role: Role.CUSTOMER,
 					status: UserStatus.ACTIVE,
 					emailVerified: true,
-					Customer: {
+					customers: {
 						create: {
 							email: googleIdTokenPayload.email,
 							name: googleIdTokenPayload.name,
+							division: Division.DHAKA,
 						},
 					},
 				},
@@ -593,6 +613,7 @@ export const AuthServices = {
 	registerCustomer,
 	verifyUserEmail,
 	loginUser,
+	getMe,
 	refreshToken,
 	forgotPassword,
 	resetPassword,

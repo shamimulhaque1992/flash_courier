@@ -928,6 +928,23 @@ const getMerchantShipments = async (query: IQuery, user: RequestUser) => {
     { isDeleted: false },
   ];
 
+  if (query.searchTerm) {
+    andConditions.push({
+      OR: [
+        { receiverName: { contains: query.searchTerm, mode: "insensitive" } },
+        {
+          receiverAddress: { contains: query.searchTerm, mode: "insensitive" },
+        },
+      ],
+    });
+  }
+
+  if (query.shipmentStatus) {
+    andConditions.push({
+      shipmentStatus: { equals: query.shipmentStatus as ShipmentStatus },
+    });
+  }
+
   applyCommonFilters(andConditions, query);
 
   const [data, total] = await Promise.all([

@@ -76,6 +76,16 @@ const getAllRiders = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const getRiderById = catchAsync(async (req: Request, res: Response) => {
+	const result = await RiderServices.getRiderById(req.params.riderId as string);
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "Rider fetched successfully",
+		data: result,
+	});
+});
+
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
 	const result = await RiderServices.getMyProfile(req.user!);
 	sendResponse(res, {
@@ -101,6 +111,7 @@ export const RiderControllers = {
 	verifyRiderEmail,
 	approveRiderApplication,
 	getAllRiders,
+	getRiderById,
 	getMyProfile,
 	updateMyProfile,
 };

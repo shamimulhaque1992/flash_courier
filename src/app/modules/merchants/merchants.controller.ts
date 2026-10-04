@@ -77,6 +77,16 @@ const getAllMerchants = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const getMerchantById = catchAsync(async (req: Request, res: Response) => {
+	const result = await MerchantServices.getMerchantById(req.params.merchantId as string);
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "Merchant fetched successfully",
+		data: result,
+	});
+});
+
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
 	const result = await MerchantServices.getMyProfile(req.user!);
 	sendResponse(res, {
@@ -102,6 +112,7 @@ export const MerchantControllers = {
 	verifyMerchantEmail,
 	approveMerchantApplication,
 	getAllMerchants,
+	getMerchantById,
 	getMyProfile,
 	updateMyProfile,
 };

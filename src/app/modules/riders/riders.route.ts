@@ -40,6 +40,12 @@ router.patch(
 );
 
 router.get(
+	"/:riderId",
+	auth(Role.ADMIN, Role.SUPER_ADMIN),
+	RiderControllers.getRiderById,
+);
+
+router.get(
 	"/",
 	auth(Role.ADMIN, Role.SUPER_ADMIN),
 	RiderControllers.getAllRiders,

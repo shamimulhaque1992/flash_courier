@@ -375,6 +375,16 @@ const getAllMerchants = async (query: IQuery) => {
 	};
 };
 
+const getMerchantById = async (merchantId: string) => {
+	const merchant = await prisma.merchants.findUnique({
+		where: { id: merchantId, isDeleted: false },
+		include: { user: { omit: { password: true } } },
+	});
+	if (!merchant)
+		throw new AppError(httpStatus.NOT_FOUND, "Merchant not found");
+	return merchant;
+};
+
 const getMyProfile = async (user: RequestUser) => {
 	const merchant = await prisma.merchants.findUnique({
 		where: { userId: user.userId, isDeleted: false },
@@ -421,6 +431,7 @@ export const MerchantServices = {
 	verifyMerchantEmail,
 	approveMerchantApplication,
 	getAllMerchants,
+	getMerchantById,
 	getMyProfile,
 	updateMyProfile,
 };

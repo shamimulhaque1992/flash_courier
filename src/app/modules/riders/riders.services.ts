@@ -315,6 +315,16 @@ const getAllRiders = async (query: IQuery) => {
 	};
 };
 
+const getRiderById = async (riderId: string) => {
+	const rider = await prisma.riders.findUnique({
+		where: { id: riderId, isDeleted: false },
+		include: { user: { omit: { password: true } } },
+	});
+	if (!rider)
+		throw new AppError(httpStatus.NOT_FOUND, "Rider not found");
+	return rider;
+};
+
 const getMyProfile = async (user: RequestUser) => {
 	const rider = await prisma.riders.findUnique({
 		where: { userId: user.userId, isDeleted: false },
@@ -363,6 +373,7 @@ export const RiderServices = {
 	verifyRiderEmail,
 	approveRiderApplication,
 	getAllRiders,
+	getRiderById,
 	getMyProfile,
 	updateMyProfile,
 };

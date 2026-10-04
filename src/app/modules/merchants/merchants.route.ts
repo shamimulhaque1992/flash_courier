@@ -44,6 +44,12 @@ router.patch(
 );
 
 router.get(
+	"/:merchantId",
+	auth(Role.ADMIN, Role.SUPER_ADMIN),
+	MerchantControllers.getMerchantById,
+);
+
+router.get(
 	"/",
 	auth(Role.ADMIN, Role.SUPER_ADMIN),
 	MerchantControllers.getAllMerchants,

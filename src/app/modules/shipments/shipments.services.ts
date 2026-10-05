@@ -427,16 +427,34 @@ const assignShipment = async (
 
       const shipment = await tx.shipments.findUnique({
         where: { id: shipmentId },
+        include: {
+          merchant: true,
+          rider: true,
+          schedule: true,
+        },
       });
 
       if (!shipment || shipment.isDeleted)
         throw new AppError(httpStatus.NOT_FOUND, "Shipment not found");
 
-      if (shipment.shipmentStatus !== ShipmentStatus.READY_FOR_ASSIGNMENT)
-        throw new AppError(
-          httpStatus.BAD_REQUEST,
-          "Shipment is not ready for assignment",
-        );
+      const isInterDivision =
+        shipment.merchant.division !== shipment.receiverDivision;
+
+      console.log(isInterDivision, "isInterDivision");
+
+      if (isInterDivision) {
+        if (shipment.shipmentStatus !== ShipmentStatus.READY_FOR_ASSIGNMENT)
+          throw new AppError(
+            httpStatus.BAD_REQUEST,
+            "Inter-division shipment must be in READY_FOR_ASSIGNMENT status before assigning",
+          );
+      } else {
+        if (shipment.shipmentStatus !== ShipmentStatus.PAID)
+          throw new AppError(
+            httpStatus.BAD_REQUEST,
+            "Intra-division shipment must be in PAID status before assigning",
+          );
+      }
 
       const slotIndex = schedule.totalSlots - schedule.availableSlots;
       const assignmentDate = getNextOccurrenceOfDay(schedule.dayOfWeek);
@@ -1051,6 +1069,10 @@ const getAllShipments = async (query: IQuery) => {
     andConditions.push({
       rider: { email: { contains: query.riderEmail, mode: "insensitive" } },
     });
+  if (query.shipmentStatus)
+    andConditions.push({
+      shipmentStatus: query.shipmentStatus as ShipmentStatus,
+    });
 
   const [data, total] = await Promise.all([
     prisma.shipments.findMany({
@@ -1059,7 +1081,7 @@ const getAllShipments = async (query: IQuery) => {
       take: limit,
       skip,
       include: {
-        merchant: { select: { name: true, email: true } },
+        merchant: { select: { name: true, email: true, division: true } },
         rider: { select: { name: true, email: true, contactNumber: true } },
         payment: true,
         schedule: {

@@ -992,6 +992,12 @@ const getCustomerShipments = async (query: IQuery, user: RequestUser) => {
     { isDeleted: false },
   ];
 
+  if (query.shipmentStatus) {
+    andConditions.push({
+      shipmentStatus: { equals: query.shipmentStatus as ShipmentStatus },
+    });
+  }
+
   applyCommonFilters(andConditions, query);
 
   const [data, total] = await Promise.all([
@@ -1001,7 +1007,24 @@ const getCustomerShipments = async (query: IQuery, user: RequestUser) => {
       take: limit,
       skip,
       include: {
+        merchant: {
+          select: {
+            name: true,
+            contactNumber: true,
+            division: true,
+            district: true,
+          },
+        },
         rider: { select: { name: true, contactNumber: true } },
+        reviews: {
+          select: {
+            id: true,
+            merchantRating: true,
+            riderRating: true,
+            comment: true,
+            createdAt: true,
+          },
+        },
       },
       omit: { otp: true },
     }),
@@ -1107,6 +1130,15 @@ const getSingleShipment = async (shipmentId: string, user: RequestUser) => {
       payment: true,
       schedule: { select: { dayOfWeek: true, startTime: true, endTime: true } },
       shipmentHistory: { orderBy: { updatedAt: "asc" } },
+      reviews: {
+        select: {
+          id: true,
+          merchantRating: true,
+          riderRating: true,
+          comment: true,
+          createdAt: true,
+        },
+      },
     },
     omit: {
       otp: true,

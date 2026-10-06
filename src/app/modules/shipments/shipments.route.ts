@@ -17,7 +17,6 @@ router.post(
 // Customer tracks their shipment by tracking number
 router.post(
 	"/track",
-	auth(Role.CUSTOMER),
 	validateRequest(ShipmentValidations.TrackShipmentZodSchema),
 	ShipmentControllers.trackShipment,
 );

@@ -85,11 +85,11 @@ const trackShipment = async (trackingNumber: string, user: RequestUser) => {
 
   if (!shipment) throw new AppError(httpStatus.NOT_FOUND, "Shipment not found");
 
-  if (shipment.receiverEmail !== user.email)
-    throw new AppError(
-      httpStatus.FORBIDDEN,
-      "You are not allowed to track this shipment",
-    );
+  // if (shipment.receiverEmail !== user.email)
+  //   throw new AppError(
+  //     httpStatus.FORBIDDEN,
+  //     "You are not allowed to track this shipment",
+  //   );
 
   return shipment;
 };

@@ -497,7 +497,7 @@ const googleLogin = async (payload: IGoogleLoginPayload) => {
 	const isCustomerExistsWithGoogleAuth = await prisma.users.findUnique({
 		where: {
 			email: googleIdTokenPayload.email,
-			role: Role.CUSTOMER,
+			// role: Role.CUSTOMER,
 			googleId: googleIdTokenPayload.sub,
 		},
 	});
@@ -508,7 +508,7 @@ const googleLogin = async (payload: IGoogleLoginPayload) => {
 		const isCustomerWithCredentialsExists = await prisma.users.findUnique({
 			where: {
 				email: googleIdTokenPayload.email,
-				role: Role.CUSTOMER,
+				// role: Role.CUSTOMER,
 			},
 		});
 
@@ -533,7 +533,7 @@ const googleLogin = async (payload: IGoogleLoginPayload) => {
 			user = await prisma.users.update({
 				where: {
 					email: googleIdTokenPayload.email,
-					role: Role.CUSTOMER,
+					// role: Role.CUSTOMER,
 				},
 				data: {
 					googleId: googleIdTokenPayload.sub,

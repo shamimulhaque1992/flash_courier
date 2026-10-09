@@ -7,6 +7,14 @@ import { AuthServices } from "./auth.services";
 import config from "../../config";
 import { IRequestUser } from "./auth.interface";
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: config.node_env === "development" ? false : true,
+  sameSite: (config.node_env === "development" ? "lax" : "none") as
+    | "lax"
+    | "none",
+};
+
 const registerCustomer = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
   await AuthServices.registerCustomer(payload);
@@ -24,14 +32,11 @@ const verifyUserEmail = catchAsync(async (req: Request, res: Response) => {
 
   const { accessToken, refreshToken, user, customers } = result;
   res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    secure: config.node_env === "development" ? false : true,
-    sameSite: config.node_env === "development" ? "lax" : "none",
+    ...cookieOptions,
     maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
   });
   res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: config.node_env === "development" ? false : true,
+    ...cookieOptions,
     sameSite: config.node_env === "development" ? "lax" : "none",
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
   });
@@ -50,15 +55,11 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { accessToken, refreshToken } = result;
 
   res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    secure: config.node_env === "development" ? false : true,
-    sameSite: config.node_env === "development" ? "lax" : "none",
+    ...cookieOptions,
     maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
   });
   res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: config.node_env === "development" ? false : true,
-    sameSite: config.node_env === "development" ? "lax" : "none",
+    ...cookieOptions,
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
   });
 
@@ -73,10 +74,9 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
 const logoutUser = catchAsync(async (req: Request, res: Response) => {
- res.clearCookie("accessToken")
- res.clearCookie("refreshToken")
+  res.clearCookie("accessToken", cookieOptions);
+  res.clearCookie("refreshToken", cookieOptions);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -104,7 +104,6 @@ const getMe = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
 const refreshToken = catchAsync(async (req: Request, res: Response) => {
   if (!req.cookies.refreshToken) {
     throw new AppError(httpStatus.UNAUTHORIZED, "Refresh token is missing");
@@ -113,15 +112,11 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   const { accessToken, refreshToken: newRefreshToken } = result;
 
   res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    secure: config.node_env === "development" ? false : true,
-    sameSite: config.node_env === "development" ? "lax" : "none",
+    ...cookieOptions,
     maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
   });
   res.cookie("refreshToken", newRefreshToken, {
-    httpOnly: true,
-    secure: config.node_env === "development" ? false : true,
-    sameSite: config.node_env === "development" ? "lax" : "none",
+    ...cookieOptions,
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
   });
 
@@ -142,15 +137,11 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
   const { accessToken, refreshToken } = result;
 
   res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    secure: config.node_env === "development" ? false : true,
-    sameSite: config.node_env === "development" ? "lax" : "none",
+    ...cookieOptions,
     maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
   });
   res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: config.node_env === "development" ? false : true,
-    sameSite: config.node_env === "development" ? "lax" : "none",
+    ...cookieOptions,
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
   });
 
